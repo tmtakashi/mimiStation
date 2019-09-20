@@ -8,12 +8,18 @@ export default new Vuex.Store({
         p: Object,
         pointATime: 0,
         pointBTime: 0,
+        markedPointA: false,
+        markedPointB: false,
+        drawer: false,
         ABLoops: []
     },
     getters: {
         p(state) { return state.p },
         pointATime(state) { return state.pointATime },
         pointBTime(state) { return state.pointBTime },
+        markedPointA(state) { return state.markedPointA },
+        markedPointB(state) { return state.markedPointB },
+        drawer(state) { return state.drawer },
         ABLoops(state) { return state.ABLoops }
     },
     mutations: {
@@ -26,6 +32,15 @@ export default new Vuex.Store({
         },
         setPointBTime(state, time) {
             state.pointBTime = time;
+        },
+        toggleMarkedPointA(state) {
+            state.markedPointA = !state.markedPointA;
+        },
+        toggleMarkedPointB(state) {
+            state.markedPointB = !state.markedPointB;
+        },
+        toggleDrawer(state) {
+            state.drawer = !state.drawer;
         }
     },
     actions: {
@@ -40,6 +55,8 @@ export default new Vuex.Store({
             const p = context.state.p;
             p.segments.removeById(loop.id);
             context.state.ABLoops = p.segments.getSegments();
+            context.commit("setPointATime", 0);
+            context.commit("setPointBTime", 0);
         },
         addABLoop(context, labelText) {
             const segment = {
@@ -52,8 +69,6 @@ export default new Vuex.Store({
             p.segments.add(segment);
             context.state.ABLoops = p.segments.getSegments();
             p.points.removeAll();
-            context.commit("setPointATime", 0);
-            context.commit("setPointBTime", 0);
         },
     }
 });

@@ -40,13 +40,11 @@ export default {
   data: function() {
     return {
       audio: null,
-      currentTime: 0,
-      markedPointA: false,
-      markedPointB: false
+      currentTime: 0
     };
   },
   computed: {
-    ...mapGetters(["p", "pointATime", "pointBTime"])
+    ...mapGetters(["p", "ABLoops", "pointATime", "pointBTime", "markedPointA", "markedPointB"])
   },
   watch: {
     currentTime(currentTime) {
@@ -86,10 +84,10 @@ export default {
           editable: true,
           labelText: "A"
         });
-        this.markedPointA = true;
+        this.$store.commit("toggleMarkedPointA");
       } else if (!this.markedPointB) {
         this.p.points.removeByTime(this.pointATime);
-        this.markedPointA = false;
+        this.$store.commit("toggleMarkedPointA") 
       }
     },
     setPointB: function() {
@@ -103,10 +101,10 @@ export default {
           editable: true,
           labelText: "B"
         });
-        this.markedPointB = true;
+        this.$store.commit("toggleMarkedPointB");
       } else if (this.markedPointA && this.pointBTime) {
         this.p.points.removeByTime(this.pointBTime);
-        this.markedPointB = false;
+        this.$store.commit("toggleMarkedPointB");
       }
       this.p.player.seek(this.$store.getters.pointATime);
     }

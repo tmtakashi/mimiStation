@@ -1,11 +1,12 @@
 <template>
-  <v-navigation-drawer app clipped>
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title class="title">AB Loops</v-list-item-title>
-      </v-list-item-content>
+  <v-navigation-drawer v-model="drawer" app clipped left>
+    <v-list-item v-if="ABLoops.length == 0">
+        <v-list-item-content>
+            <v-list-item-title>You have no AB Loops!</v-list-item-title>
+            <v-list-item-subtitle>Add a loop with the AB buttons.</v-list-item-subtitle> 
+        </v-list-item-content>
     </v-list-item>
-    <v-list-item>
+    <v-list-item class="mt-6" v-if="bothABMarked">
       <v-layout row>
         <v-flex>
           <v-text-field
@@ -25,8 +26,7 @@
 
     <v-divider></v-divider>
 
-    <v-list dense>
-      <v-subheader>Your AB Loops</v-subheader>
+    <v-list>
       <v-list-item v-for="(loop, index) in ABLoops" :key="index" two-line link>
         <v-list-item-content @click="playLoop(loop)">
           <v-list-item-title>{{ loop.labelText }}</v-list-item-title>
@@ -34,7 +34,7 @@
         </v-list-item-content>
         <v-list-item-action>
           <v-btn @click="deleteABLoop(loop)" icon>
-            <v-icon>mdi-delete-circle</v-icon>
+            <v-icon color="red">mdi-delete-circle</v-icon>
           </v-btn>
         </v-list-item-action>
       </v-list-item>
@@ -48,11 +48,19 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   data: function() {
     return {
-      ABLoopName: ""
+      ABLoopName: "",
+      bothABMarked: false
     };
   },
   computed: {
-    ...mapGetters(["ABLoops"])
+    ...mapGetters(["ABLoops", "markedPointA", "markedPointB", "drawer"])
+  },
+  watch: {
+      markedPointB(val) {
+          if (val == true && this.markedPointA == true) {
+              this.bothABMarked = true;
+          }
+      }
   },
   methods: {
     toMMSS: function(secs) {
@@ -65,6 +73,9 @@ export default {
     addABLoop: function() {
         this.$store.dispatch('addABLoop', this.ABLoopName);
         this.ABLoopName = "";
+        this.$store.commit("toggleMarkedPointA");
+        this.$store.commit("toggleMarkedPointB"); 
+        this.bothABMarked = false;
     },
     ...mapActions(["playLoop", "deleteABLoop"])
   }
