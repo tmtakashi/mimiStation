@@ -35,7 +35,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-import peaks from "peaks.js";
 
 export default {
   data: function() {
@@ -47,12 +46,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["p"])
+    ...mapGetters(["p", "pointATime", "pointBTime"])
   },
   watch: {
     currentTime(currentTime) {
-      if (Math.abs(currentTime - this.$store.getters.pointBTime) < 0.2) {
-        this.p.player.seek(this.$store.getters.pointATime);
+      let validABTime = this.pointATime != this.pointBTime;
+      if (Math.abs(currentTime - this.pointBTime) < 0.2 && validABTime) {
+        this.p.player.seek(this.pointATime);
       }
     }
   },
@@ -129,7 +129,6 @@ export default {
       keyboard: true
     };
     this.$store.commit("initializeP", options);
-    this.p.zoom.setZoom(2);
   }
 };
 </script>

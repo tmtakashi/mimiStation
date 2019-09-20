@@ -28,12 +28,12 @@
     <v-list dense>
       <v-subheader>Your AB Loops</v-subheader>
       <v-list-item v-for="(loop, index) in ABLoops" :key="index" two-line link>
-        <v-list-item-content>
-          <v-list-item-title>{{ loop.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ toMMSS(loop.pointATime) }} - {{ toMMSS(loop.pointBTime) }}</v-list-item-subtitle>
+        <v-list-item-content @click="playLoop(loop)">
+          <v-list-item-title>{{ loop.labelText }}</v-list-item-title>
+          <v-list-item-subtitle>{{ toMMSS(loop.startTime) }} - {{ toMMSS(loop.endTime) }}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
-          <v-btn @click="$store.commit('deleteABLoop', index)" icon>
+          <v-btn @click="deleteABLoop(loop)" icon>
             <v-icon>mdi-delete-circle</v-icon>
           </v-btn>
         </v-list-item-action>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data: function() {
@@ -63,9 +63,10 @@ export default {
       return [minutes, seconds].map(v => (v < 10 ? "0" + v : v)).join(":");
     },
     addABLoop: function() {
-      this.$store.commit("addABLoop", this.ABLoopName);
-      this.ABLoopName = "";
-    }
+        this.$store.dispatch('addABLoop', this.ABLoopName);
+        this.ABLoopName = "";
+    },
+    ...mapActions(["playLoop", "deleteABLoop"])
   }
 };
 </script>
