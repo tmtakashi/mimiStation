@@ -34,17 +34,20 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import peaks from "peaks.js";
 
 export default {
   data: function() {
     return {
-      p: null,
       audio: null,
       currentTime: 0,
       markedPointA: false,
       markedPointB: false
     };
+  },
+  computed: {
+    ...mapGetters(["p"])
   },
   watch: {
     currentTime(currentTime) {
@@ -110,7 +113,7 @@ export default {
   },
   mounted() {
     this.audio = this.$refs.audio;
-    this.p = peaks.init({
+    let options = {
       containers: {
         zoomview: document.getElementById("zoomview-container"),
         overview: document.getElementById("overview-container")
@@ -124,7 +127,8 @@ export default {
       zoomWaveformColor: "#6A5C55",
       zoomLevels: [128, 256, 512, 1024, 2048],
       keyboard: true
-    });
+    };
+    this.$store.commit("initializeP", options);
     this.p.zoom.setZoom(2);
   }
 };
