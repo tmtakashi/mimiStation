@@ -9,7 +9,7 @@
           <v-icon id="play-icon">mdi-skip-previous</v-icon>
         </v-btn>
         <v-btn @click="setPointA" id="segment-A-btn">A</v-btn>
-        <v-btn id="segment-B-btn">B</v-btn>
+        <v-btn @click="setPointB" id="segment-B-btn">B</v-btn>
       </div>
       <div id="overview-container"></div>
       <div class="mt-9">
@@ -21,7 +21,8 @@
         </v-btn>
       </div>
       <div id="zoomview-container"></div>
-      <audio id="my-audio">
+
+      <audio @timeupdate="currentTime = $event.target.currentTime" ref="audio">
         <source
           src="https://wavesurfer-js.org/example/split-channels/stereo.mp3"
           type="audio/mpeg"
@@ -40,9 +41,19 @@ export default {
     return {
       p: null,
       audio: null,
+      currentTime: 0,
+      markedPointA: false,
+      markedPointB: false,
       pointATime: null,
       pointBTime: null
     };
+  },
+  watch: {
+    currentTime(currentTime) {
+      if (Math.abs(currentTime - this.pointBTime) < 0.2) {
+        this.p.player.seek(this.pointATime);
+      }
+    }
   },
   methods: {
     togglePlay: function() {
@@ -67,22 +78,40 @@ export default {
       this.p.player.seek(0);
     },
     setPointA: function() {
-      if (!this.pointATime) {
-        this.pointATime = this.p.player.getCurrentTime();
+      if (this.markedPointA == this.markedPointB) {
+        this.pointATime = this.currentTime;
         this.p.points.add({
-          time: this.pointATime,
+          time: this.currentTime,
           editable: true,
           labelText: "A"
         });
-      } else {
+        this.markedPointA = true;
+      } else if (!this.markedPointB) {
         this.p.points.removeByTime(this.pointATime);
-        this.pointATime = null;
+        this.markedPointA = false;
       }
     },
-    setPointB: function() {}
+    setPointB: function() {
+      if (
+        (this.markedPointA && !this.markedPointB) ||
+        this.currentTime > this.pointATime
+      ) {
+        this.pointBTime = this.currentTime;
+        this.p.points.add({
+          time: this.currentTime,
+          editable: true,
+          labelText: "B"
+        });
+        this.markedPointB = true;
+      } else if (this.markedPointA && this.pointBTime) {
+        this.p.points.removeByTime(this.pointBTime);
+        this.markedPointB = false;
+      }
+      this.p.player.seek(this.pointATime);
+    }
   },
   mounted() {
-    this.audio = document.getElementById("my-audio");
+    this.audio = this.$refs.audio;
     this.p = peaks.init({
       containers: {
         zoomview: document.getElementById("zoomview-container"),
