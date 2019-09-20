@@ -43,15 +43,13 @@ export default {
       audio: null,
       currentTime: 0,
       markedPointA: false,
-      markedPointB: false,
-      pointATime: null,
-      pointBTime: null
+      markedPointB: false
     };
   },
   watch: {
     currentTime(currentTime) {
-      if (Math.abs(currentTime - this.pointBTime) < 0.2) {
-        this.p.player.seek(this.pointATime);
+      if (Math.abs(currentTime - this.$store.getters.pointBTime) < 0.2) {
+        this.p.player.seek(this.$store.getters.pointATime);
       }
     }
   },
@@ -79,7 +77,7 @@ export default {
     },
     setPointA: function() {
       if (this.markedPointA == this.markedPointB) {
-        this.pointATime = this.currentTime;
+        this.$store.commit("setPointATime", this.currentTime);
         this.p.points.add({
           time: this.currentTime,
           editable: true,
@@ -94,9 +92,9 @@ export default {
     setPointB: function() {
       if (
         (this.markedPointA && !this.markedPointB) ||
-        this.currentTime > this.pointATime
+        this.currentTime > this.$store.getters.pointATime
       ) {
-        this.pointBTime = this.currentTime;
+        this.$store.commit("setPointBTime", this.currentTime);
         this.p.points.add({
           time: this.currentTime,
           editable: true,
@@ -107,7 +105,7 @@ export default {
         this.p.points.removeByTime(this.pointBTime);
         this.markedPointB = false;
       }
-      this.p.player.seek(this.pointATime);
+      this.p.player.seek(this.$store.getters.pointATime);
     }
   },
   mounted() {

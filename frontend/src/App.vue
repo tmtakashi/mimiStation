@@ -1,23 +1,29 @@
 <template>
   <v-app>
     <Navbar></Navbar>
-    <Player></Player>
+    <Sidebar></Sidebar>
+    <v-content>
+      <Player></Player>
+    </v-content>
   </v-app>
 </template>
 
 <script>
-import Player from './components/Player.vue'
-import Navbar from './components/Navbar.vue'
+import store from "@/store/store.js";
+import Player from "./components/Player.vue";
+import Navbar from "./components/Navbar.vue";
+import Sidebar from "./components/Sidebar.vue";
 
 export default {
-  name: 'App',
+  store,
+  name: "App",
   components: {
     Navbar,
+    Sidebar,
     Player
   }
-}
+};
 </script>
 
 <style>
-
 </style>
