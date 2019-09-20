@@ -3,8 +3,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
-        pointATime: 0,
-        pointBTime: 0,
+        pointATime: null,
+        pointBTime: null,
         ABLoops: [
             {
                 name: 'hoge',
@@ -28,11 +28,14 @@ export default new Vuex.Store({
                 }
             )
         },
+        deleteABLoop(state, index) {
+            state.ABLoops.splice(index, 1);
+        },
         setPointATime(state, time) {
-            state.pointATime = time
+            state.pointATime = time;
         },
         setPointBTime(state, time) {
-            state.pointBTime = time
+            state.pointBTime = time;
         }
     }
 });
