@@ -3,8 +3,10 @@
     <GlobalEvents
     @keydown.space="togglePlay"
     @keydown.enter="backToBeginning"
-    @keyup.ctrl.65="setPointA"
-    @keyup.ctrl.66="setPointB"
+    @keydown.ctrl.65="setPointA"
+    @keydown.ctrl.66="setPointB"
+    @keydown.ctrl.187="zoomIn"
+    @keydown.ctrl.189="zoomOut"
     />
     <v-container>
       <div class="my-9">
@@ -41,12 +43,22 @@
       </div>
       <div id="overview-container"></div>
       <div class="mt-9">
-        <v-btn @click="zoomIn" id="zoom-in-btn">
-          <v-icon id="zoom-in-icon">mdi-magnify-plus</v-icon>
-        </v-btn>
-        <v-btn @click="zoomOut" id="zoom-out-btn">
-          <v-icon id="zoom-out-icon">mdi-magnify-minus</v-icon>
-        </v-btn>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-btn @click="zoomIn" v-on="on" id="zoom-in-btn">
+              <v-icon id="zoom-in-icon">mdi-magnify-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>Ctrl + '+'</span>
+        </v-tooltip>
+       <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-btn @click="zoomOut" v-on="on" id="zoom-out-btn">
+              <v-icon id="zoom-out-icon">mdi-magnify-minus</v-icon>
+            </v-btn>
+          </template>
+          <span>Ctrl + '-'</span>
+        </v-tooltip> 
       </div>
       <div id="zoomview-container"></div>
 
