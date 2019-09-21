@@ -11,6 +11,7 @@ export default new Vuex.Store({
         markedPointA: false,
         markedPointB: false,
         drawer: false,
+        editMode: false,
         ABLoops: []
     },
     getters: {
@@ -20,6 +21,7 @@ export default new Vuex.Store({
         markedPointA(state) { return state.markedPointA },
         markedPointB(state) { return state.markedPointB },
         drawer(state) { return state.drawer },
+        editMode(state) { return state.editMode },
         ABLoops(state) { return state.ABLoops }
     },
     mutations: {
@@ -38,6 +40,9 @@ export default new Vuex.Store({
         },
         toggleMarkedPointB(state) {
             state.markedPointB = !state.markedPointB;
+        },
+        changeEditMode(state, mode) {
+            state.editMode = mode;
         },
         toggleDrawer(state) {
             state.drawer = !state.drawer;

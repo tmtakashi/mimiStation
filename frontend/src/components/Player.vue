@@ -1,6 +1,7 @@
 <template>
   <div>
     <GlobalEvents
+    v-if="!editMode"
     @keydown.space="togglePlay"
     @keydown.enter="backToBeginning"
     @keydown.ctrl.65="setPointA"
@@ -86,7 +87,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["p", "ABLoops", "pointATime", "pointBTime", "markedPointA", "markedPointB"])
+    ...mapGetters(["p", "ABLoops", "pointATime", "pointBTime", "markedPointA", "markedPointB", "editMode"])
   },
   watch: {
     currentTime(currentTime) {
@@ -121,7 +122,7 @@ export default {
       this.p.player.seek(0);
     },
     setPointA: function() {
-      if (this.markedPointA == this.markedPointB) {
+      if (this.markedPointA == false && this.markedPointB == false) {
         this.$store.commit("setPointATime", this.currentTime);
         this.p.points.add({
           time: this.currentTime,
@@ -131,12 +132,13 @@ export default {
         this.$store.commit("toggleMarkedPointA");
       } else if (!this.markedPointB) {
         this.p.points.removeByTime(this.pointATime);
+        this.$store.commit("setPointATime", 0)
         this.$store.commit("toggleMarkedPointA") 
       }
     },
     setPointB: function() {
       if (
-        (this.markedPointA && !this.markedPointB) ||
+        (this.markedPointA && !this.markedPointB) &&
         this.currentTime > this.$store.getters.pointATime
       ) {
         this.$store.commit("setPointBTime", this.currentTime);
@@ -146,8 +148,9 @@ export default {
           labelText: "B"
         });
         this.$store.commit("toggleMarkedPointB");
-      } else if (this.markedPointA && this.pointBTime) {
+      } else if (this.markedPointA && this.markedPointB) {
         this.p.points.removeByTime(this.pointBTime);
+        this.$store.commit("setPointBTime", 0)
         this.$store.commit("toggleMarkedPointB");
       }
       this.p.player.seek(this.$store.getters.pointATime);

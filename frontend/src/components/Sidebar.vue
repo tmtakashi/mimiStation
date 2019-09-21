@@ -11,6 +11,7 @@
         <v-flex>
           <v-text-field
             @keydown.enter="addABLoop"
+            @focus="$store.commit('changeEditMode', true)"
             v-model="ABLoopName"
             label="Name"
             style="float: left; width: 80%;"
@@ -79,11 +80,12 @@ export default {
 
       return [minutes, seconds].map(v => (v < 10 ? "0" + v : v)).join(":");
     },
-    addABLoop: function() {
+    addABLoop: function(e) {
         this.$store.dispatch('addABLoop', this.ABLoopName);
         this.ABLoopName = "";
         this.$store.commit("toggleMarkedPointA");
         this.$store.commit("toggleMarkedPointB"); 
+        this.$store.commit("changeEditMode", false)
         this.bothABMarked = false;
     },
     ...mapActions(["playLoop", "deleteABLoop"])
