@@ -24,7 +24,6 @@ export default new Vuex.Store({
     },
     mutations: {
         initializeP(state, options) {
-            console.log(options);
             state.p = peaks.init(options);
             state.p.zoom.setZoom(2);
         },

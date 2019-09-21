@@ -3,19 +3,41 @@
     <GlobalEvents
     @keydown.space="togglePlay"
     @keydown.enter="backToBeginning"
-    @keyup.ctrl.107="zoomIn"
-    @keyup.ctrl.109="zoomOut"
+    @keyup.ctrl.65="setPointA"
+    @keyup.ctrl.66="setPointB"
     />
     <v-container>
       <div class="my-9">
-        <v-btn @click="togglePlay" id="play-btn">
-          <v-icon id="play-icon">mdi-play</v-icon>
-        </v-btn>
-        <v-btn @click="backToBeginning" id="beginning-btn">
-          <v-icon id="play-icon">mdi-skip-previous</v-icon>
-        </v-btn>
-        <v-btn @click="setPointA" id="segment-A-btn">A</v-btn>
-        <v-btn @click="setPointB" id="segment-B-btn">B</v-btn>
+         <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-btn @click="togglePlay" v-on="on" id="play-btn">
+              <v-icon id="play-icon">mdi-play</v-icon>
+            </v-btn>
+          </template>
+          <span>Space</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-btn @click="backToBeginning" v-on="on" id="beginning-btn">
+              <v-icon id="play-icon">mdi-skip-previous</v-icon>
+            </v-btn>
+          </template>
+          <span>Enter</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-btn @click="setPointA" v-on="on" id="segment-A-btn">A</v-btn>
+          </template>
+          <span>Ctrl + A</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-btn @click="setPointB" v-on="on" id="segment-B-btn">B</v-btn>
+          </template>
+          <span>Ctrl + B</span>
+        </v-tooltip>
+        
+        
       </div>
       <div id="overview-container"></div>
       <div class="mt-9">
@@ -40,7 +62,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import GlobalEvents from 'vue-global-events';
 import { mapGetters } from "vuex";
 
@@ -67,7 +88,6 @@ export default {
     togglePlay: function(e) {
       e.preventDefault();
       let icon = document.getElementById("play-icon");
-      console.log(e);
       if (this.audio.paused) {
         this.audio.play();
         icon.classList.remove("mdi-play");
