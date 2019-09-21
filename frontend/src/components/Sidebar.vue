@@ -1,10 +1,10 @@
 <template>
   <v-navigation-drawer v-model="drawer" app clipped left>
     <v-list-item v-if="ABLoops.length == 0">
-        <v-list-item-content>
-            <v-list-item-title>You have no AB Loops!</v-list-item-title>
-            <v-list-item-subtitle>Add a loop with the AB buttons.</v-list-item-subtitle> 
-        </v-list-item-content>
+      <v-list-item-content>
+        <v-list-item-title>You have no AB Loops!</v-list-item-title>
+        <v-list-item-subtitle>Add a loop with the AB buttons.</v-list-item-subtitle>
+      </v-list-item-content>
     </v-list-item>
     <v-list-item class="mt-6" v-if="bothABMarked">
       <v-layout row>
@@ -28,33 +28,53 @@
     <v-divider></v-divider>
 
     <v-list>
-    <draggable v-model="ABLoops" class="v-list__container" handle=".handle">
-      <v-list-item v-for="(loop, index) in ABLoops" :key="index" two-line link>
-        <v-icon class="mr-5 handle">
-            mdi-reorder-horizontal
-        </v-icon>
-        <v-list-item-content @click="playLoop(loop)">
-          <v-list-item-title>{{ loop.labelText }}</v-list-item-title>
-          <v-list-item-subtitle>{{ toMMSS(loop.startTime) }} - {{ toMMSS(loop.endTime) }}</v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action>
-          <v-btn @click="deleteABLoop(loop)" icon>
-            <v-icon color="red">mdi-delete-circle</v-icon>
-          </v-btn>
-        </v-list-item-action>
-      </v-list-item>
-    </draggable>
+      <draggable v-model="ABLoops" class="v-list__container" handle=".handle">
+        <v-list-item v-for="(loop, index) in ABLoops" :key="index" two-line link>
+          <v-icon class="mr-5 handle">mdi-reorder-horizontal</v-icon>
+          <v-list-item-content @click="playLoop(loop)">
+            <v-list-item-title>{{ loop.labelText }}</v-list-item-title>
+            <v-list-item-subtitle>{{ toMMSS(loop.startTime) }} - {{ toMMSS(loop.endTime) }}</v-list-item-subtitle>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-menu offset-y>
+              <template v-slot:activator="{ on }">
+                <v-btn icon v-on="on">
+                  <v-icon>mdi-menu-down</v-icon>
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item @click>
+                  <v-list-item-icon>
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Edit Name</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item @click="deleteABLoop(loop)">
+                  <v-list-item-icon>
+                    <v-icon>mdi-delete</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Delete Loop</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-list-item-action>
+        </v-list-item>
+      </draggable>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script>
-import draggable from 'vuedraggable'
+import draggable from "vuedraggable";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   components: {
-      draggable
+    draggable
   },
   data: function() {
     return {
@@ -66,11 +86,11 @@ export default {
     ...mapGetters(["ABLoops", "markedPointA", "markedPointB", "drawer"])
   },
   watch: {
-      markedPointB(val) {
-          if (val == true && this.markedPointA == true) {
-              this.bothABMarked = true;
-          }
+    markedPointB(val) {
+      if (val == true && this.markedPointA == true) {
+        this.bothABMarked = true;
       }
+    }
   },
   methods: {
     toMMSS: function(secs) {
@@ -80,13 +100,13 @@ export default {
 
       return [minutes, seconds].map(v => (v < 10 ? "0" + v : v)).join(":");
     },
-    addABLoop: function(e) {
-        this.$store.dispatch('addABLoop', this.ABLoopName);
-        this.ABLoopName = "";
-        this.$store.commit("toggleMarkedPointA");
-        this.$store.commit("toggleMarkedPointB"); 
-        this.$store.commit("changeEditMode", false)
-        this.bothABMarked = false;
+    addABLoop: function() {
+      this.$store.dispatch("addABLoop", this.ABLoopName);
+      this.ABLoopName = "";
+      this.$store.commit("toggleMarkedPointA");
+      this.$store.commit("toggleMarkedPointB");
+      this.$store.commit("changeEditMode", false);
+      this.bothABMarked = false;
     },
     ...mapActions(["playLoop", "deleteABLoop"])
   }
@@ -95,6 +115,6 @@ export default {
 
 <style>
 .handle {
-    cursor: move;
+  cursor: move;
 }
 </style>
