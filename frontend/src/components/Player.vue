@@ -1,5 +1,11 @@
 <template>
   <div>
+    <GlobalEvents
+    @keydown.space="togglePlay"
+    @keydown.enter="backToBeginning"
+    @keyup.ctrl.107="zoomIn"
+    @keyup.ctrl.109="zoomOut"
+    />
     <v-container>
       <div class="my-9">
         <v-btn @click="togglePlay" id="play-btn">
@@ -34,9 +40,12 @@
 </template>
 
 <script>
+import Vue from 'vue';
+import GlobalEvents from 'vue-global-events';
 import { mapGetters } from "vuex";
 
 export default {
+  components: { GlobalEvents },
   data: function() {
     return {
       audio: null,
@@ -55,8 +64,10 @@ export default {
     }
   },
   methods: {
-    togglePlay: function() {
+    togglePlay: function(e) {
+      e.preventDefault();
       let icon = document.getElementById("play-icon");
+      console.log(e);
       if (this.audio.paused) {
         this.audio.play();
         icon.classList.remove("mdi-play");
@@ -73,7 +84,8 @@ export default {
     zoomOut: function() {
       this.p.zoom.zoomOut();
     },
-    backToBeginning: function() {
+    backToBeginning: function(e) {
+      e.preventDefault()
       this.p.player.seek(0);
     },
     setPointA: function() {
@@ -124,7 +136,7 @@ export default {
       },
       zoomWaveformColor: "#6A5C55",
       zoomLevels: [128, 256, 512, 1024, 2048],
-      keyboard: true
+      keyboard:true
     };
     this.$store.commit("initializeP", options);
   }

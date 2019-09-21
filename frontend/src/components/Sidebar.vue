@@ -27,7 +27,11 @@
     <v-divider></v-divider>
 
     <v-list>
+    <draggable v-model="ABLoops" class="v-list__container" handle=".handle">
       <v-list-item v-for="(loop, index) in ABLoops" :key="index" two-line link>
+        <v-icon class="mr-5 handle">
+            mdi-reorder-horizontal
+        </v-icon>
         <v-list-item-content @click="playLoop(loop)">
           <v-list-item-title>{{ loop.labelText }}</v-list-item-title>
           <v-list-item-subtitle>{{ toMMSS(loop.startTime) }} - {{ toMMSS(loop.endTime) }}</v-list-item-subtitle>
@@ -38,14 +42,19 @@
           </v-btn>
         </v-list-item-action>
       </v-list-item>
+    </draggable>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+  components: {
+      draggable
+  },
   data: function() {
     return {
       ABLoopName: "",
@@ -83,4 +92,7 @@ export default {
 </script>
 
 <style>
+.handle {
+    cursor: move;
+}
 </style>
