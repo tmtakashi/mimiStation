@@ -16,22 +16,43 @@
           <v-btn @click.stop="showSongList=true" text>Songs</v-btn>
           <SongList :visible="showSongList" @close="showSongList=false"></SongList>
         </v-toolbar-items>
+        <v-toolbar-items>
+          <v-btn v-if="!userStatus" to="/signup" text>Sign Up</v-btn>
+        </v-toolbar-items>
+        <v-toolbar-items>
+          <v-btn v-if="userStatus" @click="logout" text>Logout</v-btn>
+        </v-toolbar-items>
       </template>
     </v-app-bar>
   </div>
 </template>
 
 <script>
+import Firebase from "./../firebase";
 import SongList from "./SongList.vue";
 
 export default {
   components: {
     SongList
   },
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+    userStatus() {
+      // ログインするとtrue
+      return this.$store.getters.isSignedIn;
+    }
+  },
   data: function() {
     return {
       showSongList: false
     };
+  },
+  methods: {
+    logout: function() {
+      Firebase.logout();
+    }
   }
 };
 </script>

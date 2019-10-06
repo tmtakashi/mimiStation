@@ -5,6 +5,8 @@ import peaks from "peaks.js";
 Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
+        user: {},
+        status: false,
         p: Object,
         pointATime: 0,
         pointBTime: 0,
@@ -15,6 +17,8 @@ export default new Vuex.Store({
         ABLoops: []
     },
     getters: {
+        user(state) { return state.user },
+        isSignedIn(state) { return state.status },
         p(state) { return state.p },
         pointATime(state) { return state.pointATime },
         pointBTime(state) { return state.pointBTime },
@@ -25,6 +29,12 @@ export default new Vuex.Store({
         ABLoops(state) { return state.ABLoops }
     },
     mutations: {
+        onAuthStateChanged(state, user) {
+            state.user = user; //firebaseが返したユーザー情報
+        },
+        onUserStatusChanged(state, status) {
+            state.status = status; //ログインしてるかどうか true or false
+        },
         initializeP(state, options) {
             state.p = peaks.init(options);
             state.p.zoom.setZoom(2);

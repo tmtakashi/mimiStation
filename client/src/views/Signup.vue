@@ -6,7 +6,7 @@
         <v-col cols="12" sm="8" md="4">
           <v-card class="elevation-12">
             <v-toolbar color="primary" dark flat>
-              <v-toolbar-title>Login</v-toolbar-title>
+              <v-toolbar-title>Sign Up</v-toolbar-title>
               <div class="flex-grow-1"></div>
             </v-toolbar>
             <v-card-text>
@@ -22,18 +22,17 @@
                 ></v-text-field>
               </v-form>
             </v-card-text>
-
             <v-card-actions>
               <div class="flex-grow-1"></div>
-
-              <v-btn @click="login" color="primary">Login</v-btn>
+              <v-btn @click="signup" color="success">Register</v-btn>
+              <br />
               <div class="ml-5">
                 or
                 <img
                   class="auth-btn"
                   src="../assets/img/btn_google_signin_dark_normal_web@2x.png"
                   width="175"
-                  v-on:click="loginWithGoogle"
+                  @click="loginWithGoogle"
                 />
               </div>
             </v-card-actions>
@@ -46,9 +45,9 @@
 </template>
 
 <script>
-import Firebase from "./../firebase";
 import { ValidationProvider, extend } from "vee-validate";
 import { required } from "vee-validate/dist/rules";
+import Firebase from "../firebase";
 
 extend("required", {
   ...required,
@@ -65,8 +64,8 @@ export default {
     };
   },
   methods: {
-    login: function() {
-      Firebase.login(this.email, this.password);
+    signup: function() {
+      Firebase.signup(this.email, this.password);
     },
     loginWithGoogle: function() {
       Firebase.loginWithGoogle();
@@ -76,7 +75,4 @@ export default {
 </script>
 
 <style>
-.auth-btn {
-  cursor: pointer;
-}
 </style>
