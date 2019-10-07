@@ -22,12 +22,16 @@
         <v-toolbar-items>
           <v-btn v-if="userStatus" @click="logout" text>Logout</v-btn>
         </v-toolbar-items>
+        <v-toolbar-items>
+          <v-btn @click="apiPrivate" text>private</v-btn>
+        </v-toolbar-items>
       </template>
     </v-app-bar>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import Firebase from "./../firebase";
 import SongList from "./SongList.vue";
 
@@ -52,6 +56,11 @@ export default {
   methods: {
     logout: function() {
       Firebase.logout();
+    },
+    apiPrivate: async function() {
+      let res = await axios.get("http://localhost:8000/private", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` }
+      });
     }
   }
 };

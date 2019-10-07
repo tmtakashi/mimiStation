@@ -30,14 +30,18 @@ export default {
     },
     login(email, password) {
         firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
-            localStorage.setItem('jwt', res.user.qa)
+            res.user.getIdToken().then(idToken => {
+                localStorage.setItem('jwt', idToken.toString())
+            })
             router.push('/')
         })
     },
     loginWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(provider).then(function (res) {
-            localStorage.setItem('jwt', res.user.qa)
+            res.user.getIdToken().then(idToken => {
+                localStorage.setItem('jwt', idToken.toString())
+            })
             router.push('/')
         }).catch(function (error) {
             alert("Failed to login with Google")
