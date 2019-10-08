@@ -53,6 +53,7 @@
 
 <script>
 import Firebase from "../firebase";
+import router from "../router";
 import { ValidationProvider, extend } from "vee-validate";
 import { required, email, max } from "vee-validate/dist/rules";
 
@@ -74,8 +75,20 @@ export default {
     };
   },
   methods: {
-    signup: function() {
-      Firebase.signup(this.email, this.password);
+    signup: async function() {
+      var res = await Firebase.signup(this.email, this.password);
+      var db = Firebase.db();
+      db.collection("users")
+        .doc(res.user.uid)
+        .set({
+          email: res.user.email
+        })
+        .then(function(docRef) {
+          router.push("/");
+        })
+        .catch(function(error) {
+          console.error("Error adding document: ", error);
+        });
     },
     loginWithGoogle: function() {
       Firebase.loginWithGoogle();

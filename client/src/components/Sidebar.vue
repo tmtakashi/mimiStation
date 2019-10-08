@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="drawer" app clipped left>
+  <v-navigation-drawer :value="drawer" app clipped left>
     <v-list-item v-if="ABLoops.length == 0">
       <v-list-item-content>
         <v-list-item-title>You have no AB Loops!</v-list-item-title>

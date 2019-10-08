@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-app-bar color="primary" clipped-left app dark>
-      <v-toolbar-title>mimiCopy</v-toolbar-title>
+      <v-toolbar-title>mimi</v-toolbar-title>
 
       <div class="flex-grow-1"></div>
 
