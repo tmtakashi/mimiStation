@@ -81,7 +81,8 @@ export default {
       db.collection("users")
         .doc(res.user.uid)
         .set({
-          email: res.user.email
+          email: res.user.email,
+          songs: []
         })
         .then(function(docRef) {
           router.push("/");

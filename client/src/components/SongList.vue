@@ -56,6 +56,22 @@ import "firebase/firestore";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 
 export default {
+  created() {
+    var db = firebase.firestore();
+    var self = this;
+    let songs;
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        let usersRef = db.collection("users").doc(user.uid);
+        usersRef.get().then(function(doc) {
+          songs = doc.data().songs;
+          self.songList = songs;
+        });
+      } else {
+        // No user is signed in.
+      }
+    });
+  },
   data: function() {
     return {
       dropzoneOptions: {
