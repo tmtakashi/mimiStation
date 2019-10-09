@@ -90,8 +90,21 @@ export default {
           console.error("Error adding document: ", error);
         });
     },
-    loginWithGoogle: function() {
-      Firebase.loginWithGoogle();
+    loginWithGoogle: async function() {
+      var res = await Firebase.loginWithGoogle();
+      var db = Firebase.db();
+      db.collection("users")
+        .doc(res.user.uid)
+        .set({
+          email: res.user.email,
+          songs: []
+        })
+        .then(function(docRef) {
+          router.push("/");
+        })
+        .catch(function(error) {
+          console.error("Error adding document: ", error);
+        });
     }
   }
 };

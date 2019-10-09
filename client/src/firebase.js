@@ -38,16 +38,18 @@ export default {
             router.push('/')
         })
     },
-    loginWithGoogle() {
+    async loginWithGoogle() {
+        let result;
         const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).then(function (res) {
+        await firebase.auth().signInWithPopup(provider).then(function (res) {
             res.user.getIdToken().then(idToken => {
                 localStorage.setItem('jwt', idToken.toString())
             })
-            router.push('/')
+            result = res;
         }).catch(function (error) {
             alert("Failed to login with Google")
-        })
+        });
+        return result;
     },
     logout() {
         localStorage.removeItem('jwt')

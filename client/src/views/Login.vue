@@ -55,6 +55,7 @@
 import Firebase from "./../firebase";
 import { ValidationProvider, extend } from "vee-validate";
 import { required, email, max } from "vee-validate/dist/rules";
+import router from "../router";
 
 extend("required", {
   ...required,
@@ -76,8 +77,21 @@ export default {
     login: function() {
       Firebase.login(this.email, this.password);
     },
-    loginWithGoogle: function() {
-      Firebase.loginWithGoogle();
+    loginWithGoogle: async function() {
+      var res = await Firebase.loginWithGoogle();
+      var db = Firebase.db();
+      db.collection("users")
+        .doc(res.user.uid)
+        .set({
+          email: res.user.email,
+          songs: []
+        })
+        .then(function(docRef) {
+          router.push("/");
+        })
+        .catch(function(error) {
+          console.error("Error adding document: ", error);
+        });
     }
   }
 };
