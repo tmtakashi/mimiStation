@@ -1,12 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import peaks from "peaks.js";
+import firebase from "firebase/app";
+import "firebase/firestore";
 
 Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         user: {},
         status: false,
+        audio: Object,
         p: Object,
         pointATime: 0,
         pointBTime: 0,
@@ -19,6 +22,7 @@ export default new Vuex.Store({
     getters: {
         user(state) { return state.user },
         isSignedIn(state) { return state.status },
+        audio(state) { return state.audio },
         p(state) { return state.p },
         pointATime(state) { return state.pointATime },
         pointBTime(state) { return state.pointBTime },
@@ -56,6 +60,23 @@ export default new Vuex.Store({
         },
         toggleDrawer(state) {
             state.drawer = !state.drawer;
+        },
+        setAudio(state, audio) {
+            state.audio = audio;
+        },
+        setSource(state, path) {
+            var audioContext = new AudioContext();
+            var storageRef = firebase.storage().ref();
+            storageRef.child(path).getDownloadURL().then(function (url) {
+                var options = {
+                    mediaUrl: url,
+                    webAudio: {
+                        audioContext: audioContext
+                    },
+                };
+                state.p.setSource(options, function (error) {
+                });
+            })
         }
     },
     actions: {

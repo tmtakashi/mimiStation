@@ -14,7 +14,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="song in songList" v-bind:key="song.id">
+              <tr v-for="(song, idx) in songList" v-bind:key="idx" @click="changeSong(idx)">
                 <td>{{ song.artist }}</td>
                 <td>{{ song.name }}</td>
                 <td></td>
@@ -171,6 +171,10 @@ export default {
           });
         }
       );
+    },
+    changeSong: function(idx) {
+      let path = this.songList[idx].path;
+      this.$store.commit("setSource", path);
     }
   }
 };

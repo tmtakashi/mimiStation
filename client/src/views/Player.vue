@@ -1,17 +1,17 @@
 <template>
   <div>
     <GlobalEvents
-    v-if="!editMode"
-    @keydown.space="togglePlay"
-    @keydown.enter="backToBeginning"
-    @keydown.ctrl.65="setPointA"
-    @keydown.ctrl.66="setPointB"
-    @keydown.ctrl.187="zoomIn"
-    @keydown.ctrl.189="zoomOut"
+      v-if="!editMode"
+      @keydown.space="togglePlay"
+      @keydown.enter="backToBeginning"
+      @keydown.ctrl.65="setPointA"
+      @keydown.ctrl.66="setPointB"
+      @keydown.ctrl.187="zoomIn"
+      @keydown.ctrl.189="zoomOut"
     />
     <v-container>
       <div class="my-9">
-         <v-tooltip top>
+        <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-btn @click="togglePlay" v-on="on" id="play-btn">
               <v-icon id="play-icon">mdi-play</v-icon>
@@ -39,8 +39,6 @@
           </template>
           <span>Ctrl + B</span>
         </v-tooltip>
-        
-        
       </div>
       <div id="overview-container"></div>
       <div class="mt-9">
@@ -52,14 +50,14 @@
           </template>
           <span>Ctrl + '+'</span>
         </v-tooltip>
-       <v-tooltip top>
+        <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-btn @click="zoomOut" v-on="on" id="zoom-out-btn">
               <v-icon id="zoom-out-icon">mdi-magnify-minus</v-icon>
             </v-btn>
           </template>
           <span>Ctrl + '-'</span>
-        </v-tooltip> 
+        </v-tooltip>
       </div>
       <div id="zoomview-container"></div>
 
@@ -75,19 +73,27 @@
 </template>
 
 <script>
-import GlobalEvents from 'vue-global-events';
+import GlobalEvents from "vue-global-events";
 import { mapGetters } from "vuex";
 
 export default {
   components: { GlobalEvents },
   data: function() {
     return {
-      audio: null,
       currentTime: 0
     };
   },
   computed: {
-    ...mapGetters(["p", "ABLoops", "pointATime", "pointBTime", "markedPointA", "markedPointB", "editMode"])
+    ...mapGetters([
+      "audio",
+      "p",
+      "ABLoops",
+      "pointATime",
+      "pointBTime",
+      "markedPointA",
+      "markedPointB",
+      "editMode"
+    ])
   },
   watch: {
     currentTime(currentTime) {
@@ -118,7 +124,7 @@ export default {
       this.p.zoom.zoomOut();
     },
     backToBeginning: function(e) {
-      e.preventDefault()
+      e.preventDefault();
       this.p.player.seek(0);
     },
     setPointA: function() {
@@ -132,13 +138,14 @@ export default {
         this.$store.commit("toggleMarkedPointA");
       } else if (!this.markedPointB) {
         this.p.points.removeByTime(this.pointATime);
-        this.$store.commit("setPointATime", 0)
-        this.$store.commit("toggleMarkedPointA") 
+        this.$store.commit("setPointATime", 0);
+        this.$store.commit("toggleMarkedPointA");
       }
     },
     setPointB: function() {
       if (
-        (this.markedPointA && !this.markedPointB) &&
+        this.markedPointA &&
+        !this.markedPointB &&
         this.currentTime > this.$store.getters.pointATime
       ) {
         this.$store.commit("setPointBTime", this.currentTime);
@@ -150,14 +157,14 @@ export default {
         this.$store.commit("toggleMarkedPointB");
       } else if (this.markedPointA && this.markedPointB) {
         this.p.points.removeByTime(this.pointBTime);
-        this.$store.commit("setPointBTime", 0)
+        this.$store.commit("setPointBTime", 0);
         this.$store.commit("toggleMarkedPointB");
       }
       this.p.player.seek(this.$store.getters.pointATime);
     }
   },
   mounted() {
-    this.audio = this.$refs.audio;
+    this.$store.commit("setAudio", this.$refs.audio);
     let options = {
       containers: {
         zoomview: document.getElementById("zoomview-container"),
@@ -171,7 +178,7 @@ export default {
       },
       zoomWaveformColor: "#6A5C55",
       zoomLevels: [128, 256, 512, 1024, 2048],
-      keyboard:true
+      keyboard: true
     };
     this.$store.commit("initializeP", options);
   }
