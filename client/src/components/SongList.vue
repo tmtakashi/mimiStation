@@ -34,7 +34,7 @@
           </v-simple-table>
           <vue-dropzone
             @vdropzone-file-added="vFileAdded"
-            ref="myVueDropzone"
+            ref="dropzone"
             id="dropzone"
             :options="dropzoneOptions"
           ></vue-dropzone>
@@ -137,6 +137,7 @@ export default {
             });
             self.uploadForm.splice(idx, 1);
           });
+        self.$refs.dropzone.removeAllFiles();
       });
     },
     storageUpload: function(file, cb) {
