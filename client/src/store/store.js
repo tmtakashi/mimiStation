@@ -17,7 +17,8 @@ export default new Vuex.Store({
         markedPointB: false,
         drawer: false,
         editMode: false,
-        ABLoops: []
+        ABLoops: [],
+        isLoading: false
     },
     getters: {
         user(state) { return state.user },
@@ -30,7 +31,8 @@ export default new Vuex.Store({
         markedPointB(state) { return state.markedPointB },
         drawer(state) { return state.drawer },
         editMode(state) { return state.editMode },
-        ABLoops(state) { return state.ABLoops }
+        ABLoops(state) { return state.ABLoops },
+        isLoading(state) { return state.isLoading }
     },
     mutations: {
         onAuthStateChanged(state, user) {
@@ -64,19 +66,8 @@ export default new Vuex.Store({
         setAudio(state, audio) {
             state.audio = audio;
         },
-        setSource(state, path) {
-            var audioContext = new AudioContext();
-            var storageRef = firebase.storage().ref();
-            storageRef.child(path).getDownloadURL().then(function (url) {
-                var options = {
-                    mediaUrl: url,
-                    webAudio: {
-                        audioContext: audioContext
-                    },
-                };
-                state.p.setSource(options, function (error) {
-                });
-            })
+        toggleLoading(state, bool) {
+            state.isLoading = bool;
         }
     },
     actions: {
@@ -106,5 +97,21 @@ export default new Vuex.Store({
             context.state.ABLoops = p.segments.getSegments();
             p.points.removeAll();
         },
+        setSource(context, path) {
+            context.commit("toggleLoading", true);
+            var audioContext = new AudioContext();
+            var storageRef = firebase.storage().ref();
+            storageRef.child(path).getDownloadURL().then(function (url) {
+                var options = {
+                    mediaUrl: url,
+                    webAudio: {
+                        audioContext: audioContext
+                    },
+                };
+                context.state.p.setSource(options, function (error) {
+                    context.commit("toggleLoading", false)
+                });
+            })
+        }
     }
 });

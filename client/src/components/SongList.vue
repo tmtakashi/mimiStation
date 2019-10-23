@@ -54,6 +54,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import vue2Dropzone from "vue2-dropzone";
 import firebase from "firebase/app";
 import "firebase/storage";
@@ -177,9 +178,9 @@ export default {
         }
       );
     },
-    changeSong: function(idx) {
+    changeSong: async function(idx) {
       let path = this.songList[idx].path;
-      this.$store.commit("setSource", path);
+      await this.$store.dispatch("setSource", path);
       this.$emit("close");
     }
   }
