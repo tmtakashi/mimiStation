@@ -30,13 +30,15 @@ export default {
             });
         return result
     },
-    login(email, password) {
-        firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
+    async login(email, password) {
+        let result;
+        await firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
             res.user.getIdToken().then(idToken => {
                 localStorage.setItem('jwt', idToken.toString())
             })
-            router.push('/')
+            result = res;
         })
+        return result;
     },
     async loginWithGoogle() {
         let result;

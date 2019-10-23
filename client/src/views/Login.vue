@@ -74,23 +74,37 @@ export default {
     };
   },
   methods: {
-    login: function() {
-      Firebase.login(this.email, this.password);
+    login: async function() {
+      var res = await Firebase.login(this.email, this.password);
+      this.createUserInDB(res);
     },
     loginWithGoogle: async function() {
       var res = await Firebase.loginWithGoogle();
+      this.createUserInDB(res);
+    },
+    createUserInDB: function(res) {
       var db = Firebase.db();
-      db.collection("users")
-        .doc(res.user.uid)
-        .set({
-          email: res.user.email,
-          songs: []
-        })
-        .then(function(docRef) {
-          router.push("/");
-        })
-        .catch(function(error) {
-          console.error("Error adding document: ", error);
+      var users = db.collection("users");
+      users
+        .where("uid", "==", res.user.uid)
+        .get()
+        .then(function(querysnapshot) {
+          if (querysnapshot.length == 0) {
+            users
+              .doc(res.user.uid)
+              .set({
+                email: res.user.email,
+                songs: []
+              })
+              .then(function(docRef) {
+                router.push("/");
+              })
+              .catch(function(error) {
+                console.error("Error adding document: ", error);
+              });
+          } else {
+            router.push("/");
+          }
         });
     }
   }
