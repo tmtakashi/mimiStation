@@ -55,6 +55,7 @@
 import Firebase from "./../firebase";
 import { ValidationProvider, extend } from "vee-validate";
 import { required, email, max } from "vee-validate/dist/rules";
+import router from "../router";
 
 extend("required", {
   ...required,
@@ -73,11 +74,38 @@ export default {
     };
   },
   methods: {
-    login: function() {
-      Firebase.login(this.email, this.password);
+    login: async function() {
+      var res = await Firebase.login(this.email, this.password);
+      this.createUserInDB(res);
     },
-    loginWithGoogle: function() {
-      Firebase.loginWithGoogle();
+    loginWithGoogle: async function() {
+      var res = await Firebase.loginWithGoogle();
+      this.createUserInDB(res);
+    },
+    createUserInDB: function(res) {
+      var db = Firebase.db();
+      var users = db.collection("users");
+      users
+        .where("uid", "==", res.user.uid)
+        .get()
+        .then(function(querysnapshot) {
+          if (querysnapshot.length == 0) {
+            users
+              .doc(res.user.uid)
+              .set({
+                email: res.user.email,
+                songs: []
+              })
+              .then(function(docRef) {
+                router.push("/");
+              })
+              .catch(function(error) {
+                console.error("Error adding document: ", error);
+              });
+          } else {
+            router.push("/");
+          }
+        });
     }
   }
 };

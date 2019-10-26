@@ -10,16 +10,39 @@
               <tr>
                 <th>Artist</th>
                 <th>Title</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Fuga</td>
-                <td>Hoge</td>
+              <tr
+                class="song"
+                v-for="(song, idx) in songList"
+                v-bind:key="`first-${idx}`"
+                @click="changeSong(idx)"
+              >
+                <td>{{ song.artist }}</td>
+                <td>{{ song.name }}</td>
+                <td></td>
+              </tr>
+              <tr v-for="(form, idx) in uploadForm" v-bind:key="`second-${idx}`">
+                <td>
+                  <v-text-field single-line label="Type artist name" v-model="form.artist"></v-text-field>
+                </td>
+                <td>
+                  <v-text-field single-line label="Type song name" v-model="form.name"></v-text-field>
+                </td>
+                <td>
+                  <v-btn color="success" @click="handleUpload(idx)">upload</v-btn>
+                </td>
               </tr>
             </tbody>
           </v-simple-table>
-          <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
+          <vue-dropzone
+            @vdropzone-file-added="vFileAdded"
+            ref="dropzone"
+            id="dropzone"
+            :options="dropzoneOptions"
+          ></vue-dropzone>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
@@ -31,20 +54,47 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import vue2Dropzone from "vue2-dropzone";
+import firebase from "firebase/app";
+import "firebase/storage";
+import "firebase/firestore";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 
 export default {
+  created() {
+    var db = firebase.firestore();
+    var self = this;
+    let songs;
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        let usersRef = db.collection("users").doc(user.uid);
+        usersRef.get().then(function(doc) {
+          songs = doc.data().songs;
+          self.songList = songs;
+        });
+      } else {
+        // No user is signed in.
+      }
+    });
+  },
   data: function() {
     return {
       dropzoneOptions: {
-        url: `http://localhost:8888/upload_songs`,
+        url: "/",
         method: "post",
         acceptedFiles: "audio/*",
-        thumbnailWidth: 100,
-        dictDefaultMessage: "<i class='fa fa-cloud-upload'></i>Upload songs",
-        addRemoveLinks: "true"
-      }
+        thumbnailWidth: 60,
+        dictDefaultMessage:
+          "<i class='fa fa-cloud-upload'></i>Upload songs (only .wav is supported)",
+        addRemoveLinks: "true",
+        chunking: true,
+        forceChunking: true,
+        autoQueue: false,
+        autoProcessQueue: false
+      },
+      songList: [],
+      uploadForm: []
     };
   },
   components: {
@@ -53,7 +103,7 @@ export default {
   props: ["visible"],
   computed: {
     show: {
-      get() {
+      get(event) {
         return this.visible;
       },
       set(value) {
@@ -64,27 +114,81 @@ export default {
     }
   },
   methods: {
-    inputFile: function(newFile, oldFile) {
-      if (newFile && oldFile && !newFile.active && oldFile.active) {
-        // Get response data
-        console.log("response", newFile.response);
-        if (newFile.xhr) {
-          //  Get the response status code
-          console.log("status", newFile.xhr.status);
-        }
-      }
+    vFileAdded: function(file) {
+      this.uploadForm.push({
+        artist: "",
+        name: "",
+        file: file
+      });
+      this.$store.commit("changeEditMode", true);
     },
-    inputFilter: function(newFile, oldFile, prevent) {
-      if (newFile && !oldFile) {
-        // Filter non-image file
-        if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
-          return prevent();
+    async handleUpload(idx) {
+      this.$store.commit("changeEditMode", false);
+      let self = this;
+      let file = this.uploadForm[idx].file;
+      let artist = this.uploadForm[idx].artist;
+      let name = this.uploadForm[idx].name;
+      await this.storageUpload(file, function(res) {
+        res.artist = artist;
+        res.name = name;
+        // add file path to db
+        let db = firebase.firestore();
+        let usersRef = db.collection("users");
+        var userRef = usersRef.doc(self.$store.getters.user.uid);
+        userRef
+          .update({
+            songs: firebase.firestore.FieldValue.arrayUnion(res)
+          })
+          .then(function() {
+            self.songList.push(res);
+            self.uploadForm.splice(idx, 1);
+          });
+        self.$refs.dropzone.removeAllFiles();
+      });
+    },
+    storageUpload: function(file, cb) {
+      var progressBar = file.previewElement.querySelectorAll(
+        "[data-dz-uploadprogress]"
+      )[0];
+      progressBar.opacity = 1;
+      let uuid = file.upload.uuid;
+      let userUid = this.$store.getters.user.uid;
+
+      let storageRef = firebase.storage().ref();
+      let extension = file.name.split(".")[1];
+      let filePath = storageRef.child(`${userUid}/${uuid}.${extension}`);
+      let task = filePath.put(file);
+
+      task.on(
+        firebase.storage.TaskEvent.STATE_CHANGED,
+        function(snapshot) {
+          let progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          progressBar.style.width = progress + "%";
+        },
+        function(error) {},
+        function() {
+          task.snapshot.ref.getMetadata().then(function(meta) {
+            var response = {
+              path: meta.fullPath,
+              timeCreated: meta.timeCreated
+            };
+            return cb(response);
+          });
         }
-      }
+      );
+    },
+    changeSong: async function(idx) {
+      let path = this.songList[idx].path;
+      await this.$store.dispatch("setSource", path);
+      this.$emit("close");
     }
   }
 };
 </script>
 
 <style>
+.song {
+  cursor: pointer;
+}
 </style>

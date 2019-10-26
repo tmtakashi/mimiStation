@@ -1,12 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import peaks from "peaks.js";
+import firebase from "firebase/app";
+import "firebase/firestore";
 
 Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         user: {},
         status: false,
+        audio: Object,
         p: Object,
         pointATime: 0,
         pointBTime: 0,
@@ -14,11 +17,13 @@ export default new Vuex.Store({
         markedPointB: false,
         drawer: false,
         editMode: false,
-        ABLoops: []
+        ABLoops: [],
+        isLoading: false
     },
     getters: {
         user(state) { return state.user },
         isSignedIn(state) { return state.status },
+        audio(state) { return state.audio },
         p(state) { return state.p },
         pointATime(state) { return state.pointATime },
         pointBTime(state) { return state.pointBTime },
@@ -26,7 +31,8 @@ export default new Vuex.Store({
         markedPointB(state) { return state.markedPointB },
         drawer(state) { return state.drawer },
         editMode(state) { return state.editMode },
-        ABLoops(state) { return state.ABLoops }
+        ABLoops(state) { return state.ABLoops },
+        isLoading(state) { return state.isLoading }
     },
     mutations: {
         onAuthStateChanged(state, user) {
@@ -56,6 +62,12 @@ export default new Vuex.Store({
         },
         toggleDrawer(state) {
             state.drawer = !state.drawer;
+        },
+        setAudio(state, audio) {
+            state.audio = audio;
+        },
+        toggleLoading(state, bool) {
+            state.isLoading = bool;
         }
     },
     actions: {
@@ -85,5 +97,21 @@ export default new Vuex.Store({
             context.state.ABLoops = p.segments.getSegments();
             p.points.removeAll();
         },
+        setSource(context, path) {
+            context.commit("toggleLoading", true);
+            var audioContext = new AudioContext();
+            var storageRef = firebase.storage().ref();
+            storageRef.child(path).getDownloadURL().then(function (url) {
+                var options = {
+                    mediaUrl: url,
+                    webAudio: {
+                        audioContext: audioContext
+                    },
+                };
+                context.state.p.setSource(options, function (error) {
+                    context.commit("toggleLoading", false)
+                });
+            })
+        }
     }
 });
