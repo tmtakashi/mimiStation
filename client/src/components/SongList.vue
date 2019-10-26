@@ -17,14 +17,14 @@
               <tr
                 class="song"
                 v-for="(song, idx) in songList"
-                v-bind:key="idx"
+                v-bind:key="`first-${idx}`"
                 @click="changeSong(idx)"
               >
                 <td>{{ song.artist }}</td>
                 <td>{{ song.name }}</td>
                 <td></td>
               </tr>
-              <tr v-for="(form, idx) in uploadForm" v-bind:key="idx">
+              <tr v-for="(form, idx) in uploadForm" v-bind:key="`second-${idx}`">
                 <td>
                   <v-text-field single-line label="Type artist name" v-model="form.artist"></v-text-field>
                 </td>
@@ -85,7 +85,8 @@ export default {
         method: "post",
         acceptedFiles: "audio/*",
         thumbnailWidth: 60,
-        dictDefaultMessage: "<i class='fa fa-cloud-upload'></i>Upload songs",
+        dictDefaultMessage:
+          "<i class='fa fa-cloud-upload'></i>Upload songs (only .wav is supported)",
         addRemoveLinks: "true",
         chunking: true,
         forceChunking: true,
@@ -102,7 +103,7 @@ export default {
   props: ["visible"],
   computed: {
     show: {
-      get() {
+      get(event) {
         return this.visible;
       },
       set(value) {
@@ -119,8 +120,10 @@ export default {
         name: "",
         file: file
       });
+      this.$store.commit("changeEditMode", true);
     },
     async handleUpload(idx) {
+      this.$store.commit("changeEditMode", false);
       let self = this;
       let file = this.uploadForm[idx].file;
       let artist = this.uploadForm[idx].artist;
