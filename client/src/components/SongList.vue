@@ -140,10 +140,7 @@ export default {
             songs: firebase.firestore.FieldValue.arrayUnion(res)
           })
           .then(function() {
-            self.songList.push({
-              artist: artist,
-              name: name
-            });
+            self.songList.push(res);
             self.uploadForm.splice(idx, 1);
           });
         self.$refs.dropzone.removeAllFiles();
