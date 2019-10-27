@@ -182,27 +182,33 @@ export default {
     },
     handleDelete: function(idx, event) {
       event.stopPropagation();
-      window.confirm(
+      let res = window.confirm(
         `Are you sure to delete ${this.songList[idx].name} by ${this.songList[idx].artist}?`
       );
-      let db = firebase.firestore();
-      let userUid = this.$store.getters.user.uid;
-      db.collection("users")
-        .doc(userUid)
-        .update({
-          songs: firebase.firestore.FieldValue.arrayRemove(this.songList[idx])
-        })
-        .then(
-          function() {
-            let storageRef = firebase.storage().ref();
-            let fileRef = storageRef.child(this.songList[idx].path);
-            fileRef.delete().then(
-              function() {
-                this.songList.splice(idx, 1);
-              }.bind(this)
-            );
-          }.bind(this)
-        );
+      if (res) {
+        this.$store.commit("toggleLoading", true); // Loading view
+        let db = firebase.firestore();
+        let userUid = this.$store.getters.user.uid;
+        db.collection("users")
+          .doc(userUid)
+          .update({
+            songs: firebase.firestore.FieldValue.arrayRemove(this.songList[idx])
+          })
+          .then(
+            function() {
+              let storageRef = firebase.storage().ref();
+              let fileRef = storageRef.child(this.songList[idx].path);
+              fileRef.delete().then(
+                function() {
+                  this.songList.splice(idx, 1);
+                  this.$store.commit("toggleLoading", false);
+                }.bind(this)
+              );
+            }.bind(this)
+          );
+      } else {
+        return;
+      }
     },
     changeSong: async function(idx) {
       let path = this.songList[idx].path;
