@@ -5,7 +5,7 @@
     <v-content>
       <router-view />
     </v-content>
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
+    <Loading :active.sync="isLoading" :is-full-page="true"></Loading>
   </v-app>
 </template>
 
