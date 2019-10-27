@@ -22,7 +22,9 @@
               >
                 <td>{{ song.artist }}</td>
                 <td>{{ song.name }}</td>
-                <td></td>
+                <td>
+                  <v-icon @click="handleDelete(idx, $event)">mdi-delete</v-icon>
+                </td>
               </tr>
               <tr v-for="(form, idx) in uploadForm" v-bind:key="`second-${idx}`">
                 <td>
@@ -177,6 +179,30 @@ export default {
           });
         }
       );
+    },
+    handleDelete: function(idx, event) {
+      event.stopPropagation();
+      window.confirm(
+        `Are you sure to delete ${this.songList[idx].name} by ${this.songList[idx].artist}?`
+      );
+      let db = firebase.firestore();
+      let userUid = this.$store.getters.user.uid;
+      db.collection("users")
+        .doc(userUid)
+        .update({
+          songs: firebase.firestore.FieldValue.arrayRemove(this.songList[idx])
+        })
+        .then(
+          function() {
+            let storageRef = firebase.storage().ref();
+            let fileRef = storageRef.child(this.songList[idx].path);
+            fileRef.delete().then(
+              function() {
+                this.songList.splice(idx, 1);
+              }.bind(this)
+            );
+          }.bind(this)
+        );
     },
     changeSong: async function(idx) {
       let path = this.songList[idx].path;
