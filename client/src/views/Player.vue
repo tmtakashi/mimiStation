@@ -10,7 +10,7 @@
       @keydown.ctrl.189="zoomOut"
     />
     <v-container>
-      <div class="my-9">
+      <div v-show="songSelected" class="my-9">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-btn @click="togglePlay" v-on="on" id="play-btn">
@@ -41,7 +41,7 @@
         </v-tooltip>
       </div>
       <div id="overview-container"></div>
-      <div class="mt-9">
+      <div class="mt-9" v-show="songSelected">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
             <v-btn @click="zoomIn" v-on="on" id="zoom-in-btn">
@@ -62,11 +62,7 @@
       <div id="zoomview-container"></div>
 
       <audio @timeupdate="currentTime = $event.target.currentTime" ref="audio">
-        <source
-          src="https://wavesurfer-js.org/example/split-channels/stereo.mp3"
-          type="audio/mpeg"
-          codecs="mp3"
-        />
+        <source />
       </audio>
     </v-container>
   </div>
@@ -92,7 +88,8 @@ export default {
       "pointBTime",
       "markedPointA",
       "markedPointB",
-      "editMode"
+      "editMode",
+      "songSelected"
     ])
   },
   watch: {
