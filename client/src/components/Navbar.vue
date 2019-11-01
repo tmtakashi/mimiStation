@@ -12,7 +12,7 @@
             <v-icon>mdi-repeat</v-icon>
           </v-btn>
         </v-toolbar-items>
-        <v-toolbar-items v-if="isSignedIn">
+        <v-toolbar-items v-if="isSignedIn && $route.name == 'player'">
           <v-btn @click.stop="toggleSongList(true)" text>Songs</v-btn>
           <SongList :visible="showSongList" @close="toggleSongList(false)"></SongList>
         </v-toolbar-items>
