@@ -64,6 +64,9 @@ import "firebase/firestore";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 
 export default {
+  beforeCreate() {
+    this.$store.commit("toggleLoading", true);
+  },
   created() {
     var db = firebase.firestore();
     var self = this;
@@ -79,6 +82,10 @@ export default {
         // No user is signed in.
       }
     });
+    this.$store.commit("toggleLoading", false);
+  },
+  beforeMount() {
+    this.$store.commit("toggleSongList", true);
   },
   data: function() {
     return {
