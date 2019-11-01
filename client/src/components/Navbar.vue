@@ -46,6 +46,7 @@ export default {
   methods: {
     logout: function() {
       Firebase.logout();
+      this.$store.commit("toggleSongSelected", false);
     },
     toggleSongList: function(bool) {
       this.$store.commit("toggleSongList", bool);
