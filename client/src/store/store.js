@@ -18,7 +18,9 @@ export default new Vuex.Store({
         drawer: false,
         editMode: false,
         ABLoops: [],
-        isLoading: false
+        isLoading: false,
+        showSongList: false,
+        songSelected: false
     },
     getters: {
         user(state) { return state.user },
@@ -32,7 +34,9 @@ export default new Vuex.Store({
         drawer(state) { return state.drawer },
         editMode(state) { return state.editMode },
         ABLoops(state) { return state.ABLoops },
-        isLoading(state) { return state.isLoading }
+        isLoading(state) { return state.isLoading },
+        showSongList(state) { return state.showSongList },
+        songSelected(state) { return state.songSelected }
     },
     mutations: {
         onAuthStateChanged(state, user) {
@@ -68,6 +72,12 @@ export default new Vuex.Store({
         },
         toggleLoading(state, bool) {
             state.isLoading = bool;
+        },
+        toggleSongList(state, bool) {
+            state.showSongList = bool;
+        },
+        toggleSongSelected(state, bool) {
+            state.songSelected = bool;
         }
     },
     actions: {
@@ -110,6 +120,9 @@ export default new Vuex.Store({
                 };
                 context.state.p.setSource(options, function (error) {
                     context.commit("toggleLoading", false)
+                    if (!context.state.songSelected) {
+                        context.commit("toggleSongSelected", true);
+                    }
                 });
             })
         }

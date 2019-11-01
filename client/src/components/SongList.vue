@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="show" scrollable max-width="600px">
+    <v-dialog v-model="show" :persistent="!songSelected" scrollable max-width="600px">
       <v-card>
         <v-card-title>Select a Song</v-card-title>
         <v-divider></v-divider>
@@ -47,7 +47,7 @@
           ></vue-dropzone>
         </v-card-text>
         <v-divider></v-divider>
-        <v-card-actions>
+        <v-card-actions v-if="songSelected">
           <v-btn color="blue darken-1" text @click.stop="show=false">close</v-btn>
         </v-card-actions>
       </v-card>
@@ -120,7 +120,8 @@ export default {
           this.$emit("close");
         }
       }
-    }
+    },
+    ...mapGetters(["songSelected"])
   },
   methods: {
     vFileAdded: function(file) {
