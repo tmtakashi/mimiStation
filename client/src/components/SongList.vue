@@ -78,7 +78,9 @@ export default {
         let usersRef = db.collection("users").doc(user.uid);
         usersRef.get().then(function(doc) {
           songs = doc.data().songs;
-          self.songList = songs;
+          self.songList = songs.sort(function(a, b) {
+            return new Date(b.timeCreated) - new Date(a.timeCreated); // newer song on the top
+          });
         });
       } else {
         // No user is signed in.
