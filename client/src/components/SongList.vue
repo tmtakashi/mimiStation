@@ -20,12 +20,14 @@
                 <td class="artist" @input="syncArtist(idx, $event)">{{ song.artist }}</td>
                 <td class="name" @input="syncName(idx, $event)">{{ song.name }}</td>
                 <td>
-                  <v-icon @click="handleDelete(idx, $event)">mdi-delete</v-icon>
+                  <v-icon class="icon" @click="handleDelete(idx, $event)">mdi-delete</v-icon>
                 </td>
                 <td>
-                  <v-icon @click="handleEdit(idx, $event)">mdi-pencil-outline</v-icon>
+                  <v-icon class="icon" @click="handleEdit(idx, $event)">mdi-pencil-outline</v-icon>
                 </td>
-                <td @click="changeSong(idx)">select</td>
+                <td>
+                  <v-btn @click="changeSong(idx)">select</v-btn>
+                </td>
               </tr>
               <tr v-for="(form, idx) in uploadForm" v-bind:key="`second-${idx}`">
                 <td>
@@ -294,7 +296,7 @@ export default {
 </script>
 
 <style>
-.song {
+.icon {
   cursor: pointer;
 }
 </style>
