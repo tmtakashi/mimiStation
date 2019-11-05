@@ -11,19 +11,22 @@
                 <th>Artist</th>
                 <th>Title</th>
                 <th></th>
+                <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                class="song"
-                v-for="(song, idx) in songList"
-                v-bind:key="`first-${idx}`"
-                @click="changeSong(idx)"
-              >
-                <td>{{ song.artist }}</td>
-                <td>{{ song.name }}</td>
+              <tr class="song" v-for="(song, idx) in songList" v-bind:key="`first-${idx}`">
+                <td class="artist" @input="syncArtist(idx, $event)">{{ song.artist }}</td>
+                <td class="name" @input="syncName(idx, $event)">{{ song.name }}</td>
                 <td>
-                  <v-icon @click="handleDelete(idx, $event)">mdi-delete</v-icon>
+                  <v-icon class="icon" @click="handleDelete(idx, $event)">mdi-delete</v-icon>
+                </td>
+                <td>
+                  <v-icon class="icon" @click="handleEdit(idx, $event)">mdi-pencil-outline</v-icon>
+                </td>
+                <td>
+                  <v-btn @click="changeSong(idx)">select</v-btn>
                 </td>
               </tr>
               <tr v-for="(form, idx) in uploadForm" v-bind:key="`second-${idx}`">
@@ -62,6 +65,7 @@ import firebase from "firebase/app";
 import "firebase/storage";
 import "firebase/firestore";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
+import _ from "underscore";
 
 export default {
   beforeCreate() {
@@ -76,7 +80,9 @@ export default {
         let usersRef = db.collection("users").doc(user.uid);
         usersRef.get().then(function(doc) {
           songs = doc.data().songs;
-          self.songList = songs;
+          self.songList = songs.sort(function(a, b) {
+            return new Date(b.timeCreated) - new Date(a.timeCreated); // newer song on the top
+          });
         });
       } else {
         // No user is signed in.
@@ -103,6 +109,7 @@ export default {
         autoProcessQueue: false
       },
       songList: [],
+      songListEdit: [],
       uploadForm: []
     };
   },
@@ -141,13 +148,16 @@ export default {
       await this.storageUpload(file, function(res) {
         res.artist = artist;
         res.name = name;
+        res.editing = false;
         // add file path to db
         let db = firebase.firestore();
         let usersRef = db.collection("users");
         var userRef = usersRef.doc(self.$store.getters.user.uid);
         userRef
           .update({
-            songs: firebase.firestore.FieldValue.arrayUnion(res)
+            songs: firebase.firestore.FieldValue.arrayUnion(
+              _.omit(res, "editing")
+            )
           })
           .then(function() {
             self.songList.push(res);
@@ -218,6 +228,64 @@ export default {
         return;
       }
     },
+    handleEdit: function(idx, event) {
+      event.stopPropagation();
+      if (this.songList[idx].editing) {
+        this.execEdit(idx, event);
+        this.$store.commit("changeEditMode", false);
+      } else {
+        this.songListEdit = JSON.parse(JSON.stringify(this.songList)); // deep copy
+        this.$store.commit("changeEditMode", true);
+        this.editNames(idx, event);
+      }
+    },
+    editNames: function(idx, event) {
+      this.songList[idx].editing = true;
+      event.target.classList.remove("mdi-pencil-outline");
+      event.target.classList.add("mdi-check");
+      let columns = event.target.parentNode.parentNode.children;
+      let artist = columns[0];
+      let name = columns[1];
+      artist.contentEditable = true;
+      name.contentEditable = true;
+      artist.focus();
+    },
+    execEdit: function(idx, event) {
+      const db = firebase.firestore();
+      const userUid = this.$store.getters.user.uid;
+      const updatedData = firebase.firestore.FieldValue.arrayUnion(
+        _.omit(this.songListEdit[idx], "editing")
+      );
+      db.collection("users")
+        .doc(userUid)
+        .update({
+          songs: firebase.firestore.FieldValue.arrayRemove(
+            _.omit(this.songList[idx], "editing")
+          )
+        })
+        .then(function() {
+          db.collection("users")
+            .doc(userUid)
+            .update({
+              songs: updatedData
+            })
+            .then(function() {
+              let columns = event.target.parentNode.parentNode.children;
+              let artist = columns[0];
+              let name = columns[1];
+              artist.contentEditable = false;
+              name.contentEditable = false;
+              event.target.classList.remove("mdi-check");
+              event.target.classList.add("mdi-pencil-outline");
+            });
+        });
+    },
+    syncArtist: function(idx, event) {
+      this.songListEdit[idx].artist = event.target.innerText;
+    },
+    syncName: function(idx, event) {
+      this.songListEdit[idx].name = event.target.innerText;
+    },
     changeSong: async function(idx) {
       let path = this.songList[idx].path;
       await this.$store.dispatch("setSource", path);
@@ -228,7 +296,7 @@ export default {
 </script>
 
 <style>
-.song {
+.icon {
   cursor: pointer;
 }
 </style>
