@@ -228,8 +228,10 @@ export default {
       event.stopPropagation();
       if (this.songList[idx].editing) {
         this.execEdit(idx, event);
+        this.$store.commit("changeEditMode", false);
       } else {
         this.songListEdit = JSON.parse(JSON.stringify(this.songList)); // deep copy
+        this.$store.commit("changeEditMode", true);
         this.editNames(idx, event);
       }
     },
