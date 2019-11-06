@@ -10,40 +10,55 @@
       @keydown.ctrl.189="zoomOut"
     />
     <v-container>
-      <div v-show="songSelected" class="my-9">
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn @click="togglePlay" v-on="on" id="play-btn">
-              <v-icon id="play-icon">mdi-play</v-icon>
-            </v-btn>
-          </template>
-          <span>Space</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn @click="backToBeginning" v-on="on" id="beginning-btn">
-              <v-icon id="play-icon">mdi-skip-previous</v-icon>
-            </v-btn>
-          </template>
-          <span>Enter</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn @click="setPointA" v-on="on" id="segment-A-btn">A</v-btn>
-          </template>
-          <span>Ctrl + A</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn @click="setPointB" v-on="on" id="segment-B-btn">B</v-btn>
-          </template>
-          <span>Ctrl + B</span>
-        </v-tooltip>
-        <div>
-          <v-slider v-model="speed" min="0.1" max="1.5" step="0.05" label="Speed"></v-slider>
-          <div>{{ speed }}</div>
-        </div>
-      </div>
+      <v-row v-show="songSelected" class="my-9">
+        <v-col cols="6">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="togglePlay" v-on="on" id="play-btn">
+                <v-icon id="play-icon">mdi-play</v-icon>
+              </v-btn>
+            </template>
+            <span>Space</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="backToBeginning" v-on="on" id="beginning-btn">
+                <v-icon id="play-icon">mdi-skip-previous</v-icon>
+              </v-btn>
+            </template>
+            <span>Enter</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="setPointA" v-on="on" id="segment-A-btn">A</v-btn>
+            </template>
+            <span>Ctrl + A</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="setPointB" v-on="on" id="segment-B-btn">B</v-btn>
+            </template>
+            <span>Ctrl + B</span>
+          </v-tooltip>
+        </v-col>
+        <v-col cols="4">
+          <v-slider v-model="speed" min="0.1" max="1.5" step="0.05" label="Speed">
+            <template v-slot:append>
+              <v-text-field
+                v-model="speed"
+                class="mt-0 pt-0"
+                min="0.1"
+                max="1.5"
+                step="0.05"
+                hide-details
+                single-line
+                type="number"
+                style="width: 60px"
+              ></v-text-field>
+            </template>
+          </v-slider>
+        </v-col>
+      </v-row>
       <div id="overview-container"></div>
       <div class="mt-9" v-show="songSelected">
         <v-tooltip top>
