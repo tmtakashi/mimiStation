@@ -10,6 +10,7 @@
       @keydown.ctrl.189="zoomOut"
     />
     <v-container>
+      <h3 v-if="songSelected && !isLoading" class>{{ currentSong.artist }} - {{ currentSong.name }}</h3>
       <v-row v-show="songSelected" class="my-9">
         <v-col cols="6">
           <v-tooltip top>
@@ -102,6 +103,7 @@ export default {
   computed: {
     ...mapGetters([
       "audioElement",
+      "currentSong",
       "p",
       "ABLoops",
       "pointATime",
@@ -109,7 +111,8 @@ export default {
       "markedPointA",
       "markedPointB",
       "editMode",
-      "songSelected"
+      "songSelected",
+      "isLoading"
     ])
   },
   watch: {

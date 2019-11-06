@@ -12,6 +12,7 @@ export default new Vuex.Store({
         status: false,
         audioContext: Object,
         audioElement: Object,
+        currentSong: Object,
         p: Object,
         pointATime: 0,
         pointBTime: 0,
@@ -28,6 +29,7 @@ export default new Vuex.Store({
         user(state) { return state.user },
         isSignedIn(state) { return state.status },
         audioElement(state) { return state.audioElement },
+        currentSong(state) { return state.currentSong },
         p(state) { return state.p },
         pointATime(state) { return state.pointATime },
         pointBTime(state) { return state.pointBTime },
@@ -80,6 +82,9 @@ export default new Vuex.Store({
         },
         toggleSongSelected(state, bool) {
             state.songSelected = bool;
+        },
+        setCurrentSong(state, song) {
+            state.currentSong = song;
         }
     },
     actions: {
