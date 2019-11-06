@@ -44,10 +44,11 @@
         </v-col>
         <v-col cols="4">
           <v-row>
-            <v-col cols="10">
+            <v-col class="py-0" cols="10">
+              <label for>Speed</label>
               <v-slider
                 v-model="speed"
-                prepend-icon="mdi-turtle"
+                prepend-icon="mdi-tortoise"
                 append-icon="mdi-rabbit"
                 min="0.1"
                 max="1.5"
