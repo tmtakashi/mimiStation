@@ -39,6 +39,10 @@
           </template>
           <span>Ctrl + B</span>
         </v-tooltip>
+        <div>
+          <v-slider v-model="speed" min="0.1" max="1.5" step="0.05" label="Speed"></v-slider>
+          <div>{{ speed }}</div>
+        </div>
       </div>
       <div id="overview-container"></div>
       <div class="mt-9" v-show="songSelected">
@@ -76,12 +80,13 @@ export default {
   components: { GlobalEvents },
   data: function() {
     return {
-      currentTime: 0
+      currentTime: 0,
+      speed: 1
     };
   },
   computed: {
     ...mapGetters([
-      "audio",
+      "audioElement",
       "p",
       "ABLoops",
       "pointATime",
@@ -98,18 +103,21 @@ export default {
       if (Math.abs(currentTime - this.pointBTime) < 0.2 && validABTime) {
         this.p.player.seek(this.pointATime);
       }
+    },
+    speed(val) {
+      this.$store.dispatch("changePlaybackRate", val);
     }
   },
   methods: {
     togglePlay: function(e) {
       e.preventDefault();
       let icon = document.getElementById("play-icon");
-      if (this.audio.paused) {
-        this.audio.play();
+      if (this.audioElement.paused) {
+        this.audioElement.play();
         icon.classList.remove("mdi-play");
         icon.classList.add("mdi-pause");
       } else {
-        this.audio.pause();
+        this.audioElement.pause();
         icon.classList.remove("mdi-pause");
         icon.classList.add("mdi-play");
       }
@@ -161,13 +169,13 @@ export default {
     }
   },
   mounted() {
-    this.$store.commit("setAudio", this.$refs.audio);
+    this.$store.commit("setAudioElement", this.$refs.audio);
     let options = {
       containers: {
         zoomview: document.getElementById("zoomview-container"),
         overview: document.getElementById("overview-container")
       },
-      mediaElement: this.audio,
+      mediaElement: this.audioElement,
       webAudio: {
         audioContext: new AudioContext(),
         audioBuffer: null,
