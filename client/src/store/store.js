@@ -3,13 +3,16 @@ import Vuex from 'vuex'
 import peaks from "peaks.js";
 import firebase from "firebase/app";
 import "firebase/firestore";
+import Dexie from "dexie";
 
 Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         user: {},
         status: false,
-        audio: Object,
+        audioContext: Object,
+        audioElement: Object,
+        currentSong: Object,
         p: Object,
         pointATime: 0,
         pointBTime: 0,
@@ -25,7 +28,8 @@ export default new Vuex.Store({
     getters: {
         user(state) { return state.user },
         isSignedIn(state) { return state.status },
-        audio(state) { return state.audio },
+        audioElement(state) { return state.audioElement },
+        currentSong(state) { return state.currentSong },
         p(state) { return state.p },
         pointATime(state) { return state.pointATime },
         pointBTime(state) { return state.pointBTime },
@@ -67,8 +71,8 @@ export default new Vuex.Store({
         toggleDrawer(state) {
             state.drawer = !state.drawer;
         },
-        setAudio(state, audio) {
-            state.audio = audio;
+        setAudioElement(state, audioElement) {
+            state.audioElement = audioElement;
         },
         toggleLoading(state, bool) {
             state.isLoading = bool;
@@ -78,6 +82,9 @@ export default new Vuex.Store({
         },
         toggleSongSelected(state, bool) {
             state.songSelected = bool;
+        },
+        setCurrentSong(state, song) {
+            state.currentSong = song;
         }
     },
     actions: {
@@ -112,19 +119,43 @@ export default new Vuex.Store({
             var audioContext = new AudioContext();
             var storageRef = firebase.storage().ref();
             storageRef.child(path).getDownloadURL().then(function (url) {
-                var options = {
-                    mediaUrl: url,
-                    webAudio: {
-                        audioContext: audioContext
-                    },
+                var request = new XMLHttpRequest();
+                request.open('GET', url, true);
+                request.responseType = 'blob';
+                request.onload = function () {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(request.response);
+                    reader.onload = function (e) {
+                        var dataURL = e.target.result;
+                        var options = {
+                            mediaUrl: dataURL,
+                            webAudio: {
+                                audioContext: audioContext
+                            },
+                        };
+                        context.state.p.setSource(options, async function (error) {
+                            context.commit("toggleLoading", false)
+                            if (!context.state.songSelected) {
+                                context.commit("toggleSongSelected", true);
+                            }
+                            const indexedDB = new Dexie('audioDB');
+                            indexedDB.version(1).stores({
+                                audioFiles: 'id, dataURL'
+                            });
+                            indexedDB.audioFiles.delete(0).then(async function () {
+                                await indexedDB.audioFiles.add({
+                                    id: 0,
+                                    dataURL: dataURL
+                                });
+                            });
+                        });
+                    };
                 };
-                context.state.p.setSource(options, function (error) {
-                    context.commit("toggleLoading", false)
-                    if (!context.state.songSelected) {
-                        context.commit("toggleSongSelected", true);
-                    }
-                });
-            })
+                request.send();
+            });
+        },
+        changePlaybackRate(context, rate) {
+            context.state.p.player._mediaElement.playbackRate = rate;
         }
     }
 });

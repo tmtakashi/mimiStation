@@ -290,6 +290,7 @@ export default {
       let path = this.songList[idx].path;
       await this.$store.dispatch("setSource", path);
       this.$emit("close");
+      this.$store.commit("setCurrentSong", this.songList[idx]);
     }
   }
 };

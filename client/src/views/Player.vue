@@ -10,36 +10,64 @@
       @keydown.ctrl.189="zoomOut"
     />
     <v-container>
-      <div v-show="songSelected" class="my-9">
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn @click="togglePlay" v-on="on" id="play-btn">
-              <v-icon id="play-icon">mdi-play</v-icon>
-            </v-btn>
-          </template>
-          <span>Space</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn @click="backToBeginning" v-on="on" id="beginning-btn">
-              <v-icon id="play-icon">mdi-skip-previous</v-icon>
-            </v-btn>
-          </template>
-          <span>Enter</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn @click="setPointA" v-on="on" id="segment-A-btn">A</v-btn>
-          </template>
-          <span>Ctrl + A</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-btn @click="setPointB" v-on="on" id="segment-B-btn">B</v-btn>
-          </template>
-          <span>Ctrl + B</span>
-        </v-tooltip>
-      </div>
+      <h3 v-if="songSelected && !isLoading" class>{{ currentSong.artist }} - {{ currentSong.name }}</h3>
+      <v-row v-show="songSelected">
+        <v-col cols="3">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="togglePlay" v-on="on" id="play-btn">
+                <v-icon id="play-icon">mdi-play</v-icon>
+              </v-btn>
+            </template>
+            <span>Space</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="backToBeginning" v-on="on" id="beginning-btn">
+                <v-icon id="play-icon">mdi-skip-previous</v-icon>
+              </v-btn>
+            </template>
+            <span>Enter</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="setPointA" v-on="on" id="segment-A-btn">A</v-btn>
+            </template>
+            <span>Ctrl + A</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="setPointB" v-on="on" id="segment-B-btn">B</v-btn>
+            </template>
+            <span>Ctrl + B</span>
+          </v-tooltip>
+        </v-col>
+        <v-col cols="4">
+          <v-row>
+            <v-col cols="10">
+              <v-slider
+                v-model="speed"
+                prepend-icon="mdi-turtle"
+                append-icon="mdi-rabbit"
+                min="0.1"
+                max="1.5"
+                step="0.01"
+              ></v-slider>
+            </v-col>
+            <v-col cols="2">
+              <v-text-field
+                v-model="speed"
+                class="mt-0 pt-0"
+                min="0.1"
+                max="1.5"
+                step="0.01"
+                hide-details
+                type="number"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
       <div id="overview-container"></div>
       <div class="mt-9" v-show="songSelected">
         <v-tooltip top>
@@ -76,12 +104,14 @@ export default {
   components: { GlobalEvents },
   data: function() {
     return {
-      currentTime: 0
+      currentTime: 0,
+      speed: 1
     };
   },
   computed: {
     ...mapGetters([
-      "audio",
+      "audioElement",
+      "currentSong",
       "p",
       "ABLoops",
       "pointATime",
@@ -89,7 +119,8 @@ export default {
       "markedPointA",
       "markedPointB",
       "editMode",
-      "songSelected"
+      "songSelected",
+      "isLoading"
     ])
   },
   watch: {
@@ -98,18 +129,21 @@ export default {
       if (Math.abs(currentTime - this.pointBTime) < 0.2 && validABTime) {
         this.p.player.seek(this.pointATime);
       }
+    },
+    speed(val) {
+      this.$store.dispatch("changePlaybackRate", val);
     }
   },
   methods: {
     togglePlay: function(e) {
       e.preventDefault();
       let icon = document.getElementById("play-icon");
-      if (this.audio.paused) {
-        this.audio.play();
+      if (this.audioElement.paused) {
+        this.audioElement.play();
         icon.classList.remove("mdi-play");
         icon.classList.add("mdi-pause");
       } else {
-        this.audio.pause();
+        this.audioElement.pause();
         icon.classList.remove("mdi-pause");
         icon.classList.add("mdi-play");
       }
@@ -161,13 +195,13 @@ export default {
     }
   },
   mounted() {
-    this.$store.commit("setAudio", this.$refs.audio);
+    this.$store.commit("setAudioElement", this.$refs.audio);
     let options = {
       containers: {
         zoomview: document.getElementById("zoomview-container"),
         overview: document.getElementById("overview-container")
       },
-      mediaElement: this.audio,
+      mediaElement: this.audioElement,
       webAudio: {
         audioContext: new AudioContext(),
         audioBuffer: null,
