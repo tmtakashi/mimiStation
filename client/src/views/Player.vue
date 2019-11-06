@@ -11,8 +11,8 @@
     />
     <v-container>
       <h3 v-if="songSelected && !isLoading" class>{{ currentSong.artist }} - {{ currentSong.name }}</h3>
-      <v-row v-show="songSelected" class="my-9">
-        <v-col cols="6">
+      <v-row v-show="songSelected">
+        <v-col cols="3">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn @click="togglePlay" v-on="on" id="play-btn">
@@ -43,21 +43,29 @@
           </v-tooltip>
         </v-col>
         <v-col cols="4">
-          <v-slider v-model="speed" min="0.1" max="1.5" step="0.05" label="Speed">
-            <template v-slot:append>
+          <v-row>
+            <v-col cols="10">
+              <v-slider
+                v-model="speed"
+                prepend-icon="mdi-turtle"
+                append-icon="mdi-rabbit"
+                min="0.1"
+                max="1.5"
+                step="0.01"
+              ></v-slider>
+            </v-col>
+            <v-col cols="2">
               <v-text-field
                 v-model="speed"
                 class="mt-0 pt-0"
                 min="0.1"
                 max="1.5"
-                step="0.05"
+                step="0.01"
                 hide-details
-                single-line
                 type="number"
-                style="width: 60px"
               ></v-text-field>
-            </template>
-          </v-slider>
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
       <div id="overview-container"></div>
