@@ -12,7 +12,7 @@
     <v-container>
       <h3 v-if="songSelected && !isLoading" class>{{ currentSong.artist }} - {{ currentSong.name }}</h3>
       <v-row v-show="songSelected">
-        <v-col cols="3">
+        <v-col cols="4">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn @click="togglePlay" v-on="on" id="play-btn">
