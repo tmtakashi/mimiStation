@@ -68,6 +68,32 @@
             </v-col>
           </v-row>
         </v-col>
+        <v-col cols="4">
+          <v-row>
+            <v-col class="py-0" cols="10">
+              <label for>Volume</label>
+              <v-slider
+                v-model="volume"
+                prepend-icon="mdi-volume-low"
+                append-icon="mdi-volume-high"
+                min="0"
+                max="1"
+                step="0.01"
+              ></v-slider>
+            </v-col>
+            <v-col cols="2">
+              <v-text-field
+                v-model="volume"
+                class="mt-0 pt-0"
+                min="0"
+                max="1"
+                step="0.01"
+                hide-details
+                type="number"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-col>
       </v-row>
       <div id="overview-container"></div>
       <div class="mt-9" v-show="songSelected">
@@ -106,12 +132,14 @@ export default {
   data: function() {
     return {
       currentTime: 0,
-      speed: 1
+      speed: 1,
+      volume: 1
     };
   },
   computed: {
     ...mapGetters([
       "audioElement",
+      "audioContext",
       "currentSong",
       "p",
       "ABLoops",
@@ -133,6 +161,9 @@ export default {
     },
     speed(val) {
       this.$store.dispatch("changePlaybackRate", val);
+    },
+    volume(val) {
+      this.$store.commit("setGainValue", val);
     }
   },
   methods: {
@@ -204,7 +235,7 @@ export default {
       },
       mediaElement: this.audioElement,
       webAudio: {
-        audioContext: new AudioContext(),
+        audioContext: this.audioContext,
         audioBuffer: null,
         multiChannel: false
       },
@@ -212,7 +243,7 @@ export default {
       zoomLevels: [128, 256, 512, 1024, 2048],
       keyboard: true
     };
-    this.$store.commit("initializeP", options);
+    this.$store.dispatch("initializeP", options);
   }
 };
 </script>

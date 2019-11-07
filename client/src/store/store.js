@@ -10,7 +10,9 @@ export default new Vuex.Store({
     state: {
         user: {},
         status: false,
-        audioContext: Object,
+        audioContext: new AudioContext(),
+        sourceNode: Object,
+        gainNode: Object,
         audioElement: Object,
         currentSong: Object,
         p: Object,
@@ -29,6 +31,7 @@ export default new Vuex.Store({
         user(state) { return state.user },
         isSignedIn(state) { return state.status },
         audioElement(state) { return state.audioElement },
+        audioContext(state) { return state.audioContext },
         currentSong(state) { return state.currentSong },
         p(state) { return state.p },
         pointATime(state) { return state.pointATime },
@@ -40,7 +43,8 @@ export default new Vuex.Store({
         ABLoops(state) { return state.ABLoops },
         isLoading(state) { return state.isLoading },
         showSongList(state) { return state.showSongList },
-        songSelected(state) { return state.songSelected }
+        songSelected(state) { return state.songSelected },
+        sourceNode(state) { return state.sourceNode },
     },
     mutations: {
         onAuthStateChanged(state, user) {
@@ -48,10 +52,6 @@ export default new Vuex.Store({
         },
         onUserStatusChanged(state, status) {
             state.status = status; //ログインしてるかどうか true or false
-        },
-        initializeP(state, options) {
-            state.p = peaks.init(options);
-            state.p.zoom.setZoom(2);
         },
         setPointATime(state, time) {
             state.pointATime = time;
@@ -85,9 +85,36 @@ export default new Vuex.Store({
         },
         setCurrentSong(state, song) {
             state.currentSong = song;
+        },
+        setAudioContext(state, audioContext) {
+            state.audioContext = audioContext;
+        },
+        setSourceNode(state, sourceNode) {
+            state.sourceNode = sourceNode;
+        },
+        setGainNode(state, gainNode) {
+            state.gainNode = gainNode;
+        },
+        setGainValue(state, val) {
+            state.gainNode.gain.value = val;
+        },
+        setP(state, p) {
+            state.p = p;
         }
     },
     actions: {
+        initializeP(context, options) {
+            context.commit("setP", peaks.init(options));
+            var p = context.state.p;
+            p.zoom.setZoom(2);
+            var audioContext = context.state.audioContext;
+            var source = audioContext.createMediaElementSource(p.player._mediaElement)
+            var gainNode = audioContext.createGain();
+            context.commit("setSourceNode", source);
+            context.commit("setGainNode", gainNode);
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+        },
         playLoop(context, loop) {
             const p = context.state.p;
             const segment = p.segments.getSegment(loop.id);
@@ -116,7 +143,7 @@ export default new Vuex.Store({
         },
         setSource(context, path) {
             context.commit("toggleLoading", true);
-            var audioContext = new AudioContext();
+            var audioContext = context.state.audioContext;
             var storageRef = firebase.storage().ref();
             storageRef.child(path).getDownloadURL().then(function (url) {
                 var request = new XMLHttpRequest();
@@ -156,6 +183,6 @@ export default new Vuex.Store({
         },
         changePlaybackRate(context, rate) {
             context.state.p.player._mediaElement.playbackRate = rate;
-        }
+        },
     }
 });
