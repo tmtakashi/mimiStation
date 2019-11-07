@@ -10,7 +10,7 @@ export default new Vuex.Store({
     state: {
         user: {},
         status: false,
-        audioContext: Object,
+        audioContext: new AudioContext(),
         sourceNode: Object,
         gainNode: Object,
         audioElement: Object,
@@ -31,6 +31,7 @@ export default new Vuex.Store({
         user(state) { return state.user },
         isSignedIn(state) { return state.status },
         audioElement(state) { return state.audioElement },
+        audioContext(state) { return state.audioContext },
         currentSong(state) { return state.currentSong },
         p(state) { return state.p },
         pointATime(state) { return state.pointATime },
@@ -131,7 +132,7 @@ export default new Vuex.Store({
         },
         setSource(context, path) {
             context.commit("toggleLoading", true);
-            var audioContext = new AudioContext();
+            var audioContext = context.state.audioContext;
             var storageRef = firebase.storage().ref();
             storageRef.child(path).getDownloadURL().then(function (url) {
                 var request = new XMLHttpRequest();
@@ -175,7 +176,6 @@ export default new Vuex.Store({
                     };
                 };
                 request.send();
-                context.commit("setAudioContext", audioContext);
             });
         },
         changePlaybackRate(context, rate) {

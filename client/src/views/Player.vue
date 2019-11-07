@@ -139,6 +139,7 @@ export default {
   computed: {
     ...mapGetters([
       "audioElement",
+      "audioContext",
       "currentSong",
       "p",
       "ABLoops",
@@ -234,7 +235,7 @@ export default {
       },
       mediaElement: this.audioElement,
       webAudio: {
-        audioContext: new AudioContext(),
+        audioContext: this.audioContext,
         audioBuffer: null,
         multiChannel: false
       },
