@@ -11,6 +11,8 @@ export default new Vuex.Store({
         user: {},
         status: false,
         audioContext: Object,
+        sourceNode: Object,
+        gainNode: Object,
         audioElement: Object,
         currentSong: Object,
         p: Object,
@@ -40,7 +42,8 @@ export default new Vuex.Store({
         ABLoops(state) { return state.ABLoops },
         isLoading(state) { return state.isLoading },
         showSongList(state) { return state.showSongList },
-        songSelected(state) { return state.songSelected }
+        songSelected(state) { return state.songSelected },
+        sourceNode(state) { return state.sourceNode },
     },
     mutations: {
         onAuthStateChanged(state, user) {
@@ -85,6 +88,18 @@ export default new Vuex.Store({
         },
         setCurrentSong(state, song) {
             state.currentSong = song;
+        },
+        setAudioContext(state, audioContext) {
+            state.audioContext = audioContext;
+        },
+        setSourceNode(state, sourceNode) {
+            state.sourceNode = sourceNode;
+        },
+        setGainNode(state, gainNode) {
+            state.gainNode = gainNode;
+        },
+        setGainValue(state, val) {
+            state.gainNode.gain.value = val;
         }
     },
     actions: {
@@ -148,14 +163,23 @@ export default new Vuex.Store({
                                     dataURL: dataURL
                                 });
                             });
+
+                            // set nodes
+                            var source = audioContext.createMediaElementSource(context.state.p.player._mediaElement)
+                            var gainNode = audioContext.createGain();
+                            context.commit("setSourceNode", source);
+                            context.commit("setGainNode", gainNode);
+                            source.connect(gainNode);
+                            gainNode.connect(audioContext.destination);
                         });
                     };
                 };
                 request.send();
+                context.commit("setAudioContext", audioContext);
             });
         },
         changePlaybackRate(context, rate) {
             context.state.p.player._mediaElement.playbackRate = rate;
-        }
+        },
     }
 });
