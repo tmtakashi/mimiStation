@@ -243,7 +243,7 @@ export default {
       zoomLevels: [128, 256, 512, 1024, 2048],
       keyboard: true
     };
-    this.$store.commit("initializeP", options);
+    this.$store.dispatch("initializeP", options);
   }
 };
 </script>

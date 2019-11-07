@@ -53,10 +53,6 @@ export default new Vuex.Store({
         onUserStatusChanged(state, status) {
             state.status = status; //ログインしてるかどうか true or false
         },
-        initializeP(state, options) {
-            state.p = peaks.init(options);
-            state.p.zoom.setZoom(2);
-        },
         setPointATime(state, time) {
             state.pointATime = time;
         },
@@ -101,9 +97,24 @@ export default new Vuex.Store({
         },
         setGainValue(state, val) {
             state.gainNode.gain.value = val;
+        },
+        setP(state, p) {
+            state.p = p;
         }
     },
     actions: {
+        initializeP(context, options) {
+            context.commit("setP", peaks.init(options));
+            var p = context.state.p;
+            p.zoom.setZoom(2);
+            var audioContext = context.state.audioContext;
+            var source = audioContext.createMediaElementSource(p.player._mediaElement)
+            var gainNode = audioContext.createGain();
+            context.commit("setSourceNode", source);
+            context.commit("setGainNode", gainNode);
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+        },
         playLoop(context, loop) {
             const p = context.state.p;
             const segment = p.segments.getSegment(loop.id);
@@ -164,14 +175,6 @@ export default new Vuex.Store({
                                     dataURL: dataURL
                                 });
                             });
-
-                            // set nodes
-                            var source = audioContext.createMediaElementSource(context.state.p.player._mediaElement)
-                            var gainNode = audioContext.createGain();
-                            context.commit("setSourceNode", source);
-                            context.commit("setGainNode", gainNode);
-                            source.connect(gainNode);
-                            gainNode.connect(audioContext.destination);
                         });
                     };
                 };
