@@ -13,6 +13,11 @@ export default new Vuex.Store({
         audioContext: new AudioContext(),
         sourceNode: Object,
         gainNode: Object,
+        leftGainNode: Object,
+        rightGainNode: Object,
+        channelSplitterNode: Object,
+        mergerNode: Object,
+        stereoPannerNode: Object,
         audioElement: Object,
         currentSong: Object,
         p: Object,
@@ -92,11 +97,43 @@ export default new Vuex.Store({
         setSourceNode(state, sourceNode) {
             state.sourceNode = sourceNode;
         },
-        setGainNode(state, gainNode) {
-            state.gainNode = gainNode;
+        setGainNode(state, { gainNode, type }) {
+            switch (type) {
+                case 'center':
+                    state.gainNode = gainNode;
+                    break;
+                case 'right':
+                    state.rightGainNode = gainNode;
+                    break;
+                case 'left':
+                    state.leftGainNode = gainNode;
+                    break;
+            }
         },
-        setGainValue(state, val) {
-            state.gainNode.gain.value = val;
+        setGainValue(state, { val, type }) {
+            switch (type) {
+                case 'center':
+                    state.gainNode.gain.value = val;
+                    break;
+                case 'right':
+                    state.rightGainNode.gain.value = val;
+                    break;
+                case 'left':
+                    state.leftGainNode.gain.value = val;
+                    break;
+            }
+        },
+        setSplitterNode(state, splitterNode) {
+            state.channelSplitterNode = splitterNode;
+        },
+        setMergerNode(state, mergerNode) {
+            state.mergerNode = mergerNode;
+        },
+        setStereoPannerNode(state, stereoPannerNode) {
+            state.stereoPannerNode = stereoPannerNode;
+        },
+        setPanValue(state, val) {
+            state.stereoPannerNode.pan.value = val;
         },
         setP(state, p) {
             state.p = p;
@@ -106,14 +143,32 @@ export default new Vuex.Store({
         initializeP(context, options) {
             context.commit("setP", peaks.init(options));
             var p = context.state.p;
-            p.zoom.setZoom(2);
+            p.zoom.setZoom(2)
             var audioContext = context.state.audioContext;
             var source = audioContext.createMediaElementSource(p.player._mediaElement)
             var gainNode = audioContext.createGain();
+            var leftGainNode = audioContext.createGain();
+            var rightGainNode = audioContext.createGain();
+            var splitterNode = audioContext.createChannelSplitter(2);
+            var mergerNode = audioContext.createChannelMerger(2);
+            var stereoPannerNode = audioContext.createStereoPanner();
+
             context.commit("setSourceNode", source);
-            context.commit("setGainNode", gainNode);
+            context.commit("setGainNode", { gainNode: gainNode, type: 'center' });
+            context.commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
+            context.commit("setGainNode", { gainNode: rightGainNode, type: 'right' });
+            context.commit("setSplitterNode", splitterNode);
+            context.commit("setMergerNode", mergerNode);
+            context.commit("setStereoPannerNode", stereoPannerNode);
+
             source.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            gainNode.connect(splitterNode);
+            splitterNode.connect(leftGainNode, 0);
+            splitterNode.connect(rightGainNode, 1);
+            leftGainNode.connect(mergerNode, 0, 0);
+            rightGainNode.connect(mergerNode, 0, 1);
+            mergerNode.connect(stereoPannerNode);
+            stereoPannerNode.connect(audioContext.destination);
         },
         playLoop(context, loop) {
             const p = context.state.p;

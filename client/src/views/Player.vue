@@ -12,7 +12,7 @@
     <v-container>
       <h3 v-if="songSelected && !isLoading" class>{{ currentSong.artist }} - {{ currentSong.name }}</h3>
       <v-row v-show="songSelected">
-        <v-col cols="4">
+        <v-col cols="3">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn @click="togglePlay" v-on="on" id="play-btn">
@@ -42,9 +42,9 @@
             <span>Ctrl + B</span>
           </v-tooltip>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
           <v-row>
-            <v-col class="py-0" cols="10">
+            <v-col class="py-0" cols="8">
               <label for>Speed</label>
               <v-slider
                 v-model="speed"
@@ -55,7 +55,7 @@
                 step="0.01"
               ></v-slider>
             </v-col>
-            <v-col cols="2">
+            <v-col cols="4">
               <v-text-field
                 v-model="speed"
                 class="mt-0 pt-0"
@@ -68,7 +68,7 @@
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
           <v-row>
             <v-col class="py-0" cols="10">
               <label for>Volume</label>
@@ -88,13 +88,87 @@
                 min="0"
                 max="1"
                 step="0.01"
-                hide-details
+                hide-detail
                 type="number"
               ></v-text-field>
             </v-col>
           </v-row>
         </v-col>
+        <v-col cols="2">
+          <v-menu
+            :close-on-content-click="false"
+            :close-on-click="false"
+            :nudge-width="250"
+            offset-y
+          >
+            <template v-slot:activator="{ on }">
+              <v-btn color="primary" dark v-on="on">LR Control</v-btn>
+            </template>
+
+            <v-card class="py-3 px-3">
+              <v-row>
+                <v-col cols="9">
+                  <v-row>
+                    <v-col class="py-0" cols="9">
+                      <label for>Left Volume</label>
+                      <v-slider
+                        v-model="leftVolume"
+                        prepend-icon="mdi-volume-low"
+                        append-icon="mdi-volume-high"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                      ></v-slider>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-text-field
+                        v-model="leftVolume"
+                        class="mt-0 pt-0"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        hide-detail
+                        type="number"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col class="py-0" cols="9">
+                      <label for>Right Volume</label>
+                      <v-slider
+                        v-model="rightVolume"
+                        prepend-icon="mdi-volume-low"
+                        append-icon="mdi-volume-high"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                      ></v-slider>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-text-field
+                        v-model="rightVolume"
+                        class="mt-0 pt-0"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        hide-detail
+                        type="number"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-col align-center cols="3">
+                  <v-flex fill-height>
+                    <label for>Pan</label>
+                    <knob-control :min="0" :max="127" :stepSize="1" :size="70" v-model="pan"></knob-control>
+                  </v-flex>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-menu>
+        </v-col>
       </v-row>
+
       <div id="overview-container"></div>
       <div class="mt-9" v-show="songSelected">
         <v-tooltip top>
@@ -126,14 +200,21 @@
 <script>
 import GlobalEvents from "vue-global-events";
 import { mapGetters } from "vuex";
+import KnobControl from "vue-knob-control";
 
 export default {
-  components: { GlobalEvents },
+  components: {
+    GlobalEvents,
+    KnobControl
+  },
   data: function() {
     return {
       currentTime: 0,
       speed: 1,
-      volume: 1
+      volume: 1,
+      leftVolume: 1,
+      rightVolume: 1,
+      pan: 64
     };
   },
   computed: {
@@ -163,7 +244,20 @@ export default {
       this.$store.dispatch("changePlaybackRate", val);
     },
     volume(val) {
-      this.$store.commit("setGainValue", val);
+      this.$store.commit("setGainValue", { val: val, type: "center" });
+    },
+    leftVolume(val) {
+      this.$store.commit("setGainValue", { val: val, type: "left" });
+    },
+    rightVolume(val) {
+      this.$store.commit("setGainValue", { val: val, type: "right" });
+    },
+    pan(val) {
+      if (val == 0) {
+        val = 1;
+      }
+      var pan = ((val - 1) / (127 - 1)) * (1 - -1) + -1;
+      this.$store.commit("setPanValue", pan);
     }
   },
   methods: {
