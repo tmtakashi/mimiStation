@@ -94,57 +94,66 @@
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="3">
-          <v-row>
-            <v-col class="py-0" cols="10">
-              <label for>Left Volume</label>
-              <v-slider
-                v-model="leftVolume"
-                prepend-icon="mdi-volume-low"
-                append-icon="mdi-volume-high"
-                min="0"
-                max="1"
-                step="0.01"
-              ></v-slider>
-            </v-col>
-            <v-col cols="2">
-              <v-text-field
-                v-model="leftVolume"
-                class="mt-0 pt-0"
-                min="0"
-                max="1"
-                step="0.01"
-                hide-detail
-                type="number"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="py-0" cols="10">
-              <label for>Right Volume</label>
-              <v-slider
-                v-model="rightVolume"
-                prepend-icon="mdi-volume-low"
-                append-icon="mdi-volume-high"
-                min="0"
-                max="1"
-                step="0.01"
-              ></v-slider>
-            </v-col>
-            <v-col cols="2">
-              <v-text-field
-                v-model="rightVolume"
-                class="mt-0 pt-0"
-                min="0"
-                max="1"
-                step="0.01"
-                hide-detail
-                type="number"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+        <v-col cols="2">
+          <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-y>
+            <template v-slot:activator="{ on }">
+              <v-btn color="primary" dark v-on="on">LR Control</v-btn>
+            </template>
+
+            <v-card class="py-3 px-3">
+              <v-row>
+                <v-col class="py-0" cols="9">
+                  <label for>Left Volume</label>
+                  <v-slider
+                    v-model="leftVolume"
+                    prepend-icon="mdi-volume-low"
+                    append-icon="mdi-volume-high"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                  ></v-slider>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    v-model="leftVolume"
+                    class="mt-0 pt-0"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    hide-detail
+                    type="number"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col class="py-0" cols="9">
+                  <label for>Right Volume</label>
+                  <v-slider
+                    v-model="rightVolume"
+                    prepend-icon="mdi-volume-low"
+                    append-icon="mdi-volume-high"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                  ></v-slider>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    v-model="rightVolume"
+                    class="mt-0 pt-0"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    hide-detail
+                    type="number"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-menu>
         </v-col>
       </v-row>
+
       <div id="overview-container"></div>
       <div class="mt-9" v-show="songSelected">
         <v-tooltip top>
