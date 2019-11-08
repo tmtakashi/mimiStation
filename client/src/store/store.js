@@ -17,6 +17,7 @@ export default new Vuex.Store({
         rightGainNode: Object,
         channelSplitterNode: Object,
         mergerNode: Object,
+        stereoPannerNode: Object,
         audioElement: Object,
         currentSong: Object,
         p: Object,
@@ -128,6 +129,12 @@ export default new Vuex.Store({
         setMergerNode(state, mergerNode) {
             state.mergerNode = mergerNode;
         },
+        setStereoPannerNode(state, stereoPannerNode) {
+            state.stereoPannerNode = stereoPannerNode;
+        },
+        setPanValue(state, val) {
+            state.stereoPannerNode.pan.value = val;
+        },
         setP(state, p) {
             state.p = p;
         }
@@ -144,6 +151,7 @@ export default new Vuex.Store({
             var rightGainNode = audioContext.createGain();
             var splitterNode = audioContext.createChannelSplitter(2);
             var mergerNode = audioContext.createChannelMerger(2);
+            var stereoPannerNode = audioContext.createStereoPanner();
 
             context.commit("setSourceNode", source);
             context.commit("setGainNode", { gainNode: gainNode, type: 'center' });
@@ -151,6 +159,7 @@ export default new Vuex.Store({
             context.commit("setGainNode", { gainNode: rightGainNode, type: 'right' });
             context.commit("setSplitterNode", splitterNode);
             context.commit("setMergerNode", mergerNode);
+            context.commit("setStereoPannerNode", stereoPannerNode);
 
             source.connect(gainNode);
             gainNode.connect(splitterNode);
@@ -158,7 +167,8 @@ export default new Vuex.Store({
             splitterNode.connect(rightGainNode, 1);
             leftGainNode.connect(mergerNode, 0, 0);
             rightGainNode.connect(mergerNode, 0, 1);
-            mergerNode.connect(audioContext.destination);
+            mergerNode.connect(stereoPannerNode);
+            stereoPannerNode.connect(audioContext.destination);
         },
         playLoop(context, loop) {
             const p = context.state.p;
