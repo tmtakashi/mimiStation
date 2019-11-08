@@ -12,7 +12,7 @@
     <v-container>
       <h3 v-if="songSelected && !isLoading" class>{{ currentSong.artist }} - {{ currentSong.name }}</h3>
       <v-row v-show="songSelected">
-        <v-col cols="4">
+        <v-col cols="3">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn @click="togglePlay" v-on="on" id="play-btn">
@@ -42,9 +42,9 @@
             <span>Ctrl + B</span>
           </v-tooltip>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
           <v-row>
-            <v-col class="py-0" cols="10">
+            <v-col class="py-0" cols="8">
               <label for>Speed</label>
               <v-slider
                 v-model="speed"
@@ -55,7 +55,7 @@
                 step="0.01"
               ></v-slider>
             </v-col>
-            <v-col cols="2">
+            <v-col cols="4">
               <v-text-field
                 v-model="speed"
                 class="mt-0 pt-0"
@@ -68,7 +68,7 @@
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
           <v-row>
             <v-col class="py-0" cols="10">
               <label for>Volume</label>
@@ -88,7 +88,57 @@
                 min="0"
                 max="1"
                 step="0.01"
-                hide-details
+                hide-detail
+                type="number"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-col>
+        <v-col cols="3">
+          <v-row>
+            <v-col class="py-0" cols="10">
+              <label for>Left Volume</label>
+              <v-slider
+                v-model="leftVolume"
+                prepend-icon="mdi-volume-low"
+                append-icon="mdi-volume-high"
+                min="0"
+                max="1"
+                step="0.01"
+              ></v-slider>
+            </v-col>
+            <v-col cols="2">
+              <v-text-field
+                v-model="leftVolume"
+                class="mt-0 pt-0"
+                min="0"
+                max="1"
+                step="0.01"
+                hide-detail
+                type="number"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="py-0" cols="10">
+              <label for>Right Volume</label>
+              <v-slider
+                v-model="rightVolume"
+                prepend-icon="mdi-volume-low"
+                append-icon="mdi-volume-high"
+                min="0"
+                max="1"
+                step="0.01"
+              ></v-slider>
+            </v-col>
+            <v-col cols="2">
+              <v-text-field
+                v-model="rightVolume"
+                class="mt-0 pt-0"
+                min="0"
+                max="1"
+                step="0.01"
+                hide-detail
                 type="number"
               ></v-text-field>
             </v-col>
@@ -133,7 +183,9 @@ export default {
     return {
       currentTime: 0,
       speed: 1,
-      volume: 1
+      volume: 1,
+      leftVolume: 1,
+      rightVolume: 1
     };
   },
   computed: {
@@ -163,7 +215,13 @@ export default {
       this.$store.dispatch("changePlaybackRate", val);
     },
     volume(val) {
-      this.$store.commit("setGainValue", val);
+      this.$store.commit("setGainValue", { val: val, type: "center" });
+    },
+    leftVolume(val) {
+      this.$store.commit("setGainValue", { val: val, type: "left" });
+    },
+    rightVolume(val) {
+      this.$store.commit("setGainValue", { val: val, type: "right" });
     }
   },
   methods: {
