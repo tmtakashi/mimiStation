@@ -68,7 +68,7 @@
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="4">
           <v-row>
             <v-col class="py-0" cols="10">
               <label for>Volume</label>
@@ -95,12 +95,7 @@
           </v-row>
         </v-col>
         <v-col cols="2">
-          <v-menu
-            :close-on-content-click="false"
-            :close-on-click="false"
-            :nudge-width="250"
-            offset-y
-          >
+          <v-menu :close-on-content-click="false" :nudge-width="250" offset-y>
             <template v-slot:activator="{ on }">
               <v-btn color="primary" dark v-on="on">LR Control</v-btn>
             </template>
