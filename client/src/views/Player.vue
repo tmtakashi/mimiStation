@@ -68,7 +68,7 @@
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
           <v-row>
             <v-col class="py-0" cols="10">
               <label for>Volume</label>
@@ -162,6 +162,14 @@
             </v-card>
           </v-menu>
         </v-col>
+        <v-col cols="1">
+          <v-menu :close-on-content-click="false" :nudge-width="600" offset-y>
+            <template v-slot:activator="{ on }">
+              <v-btn color="primary" dark v-on="on">EQ</v-btn>
+            </template>
+            <Equalizer></Equalizer>
+          </v-menu>
+        </v-col>
       </v-row>
 
       <div id="overview-container"></div>
@@ -196,11 +204,13 @@
 import GlobalEvents from "vue-global-events";
 import { mapGetters } from "vuex";
 import KnobControl from "vue-knob-control";
+import Equalizer from "@/components/Equalizer.vue";
 
 export default {
   components: {
     GlobalEvents,
-    KnobControl
+    KnobControl,
+    Equalizer
   },
   data: function() {
     return {
