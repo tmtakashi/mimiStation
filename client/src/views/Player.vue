@@ -94,10 +94,10 @@
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="1">
           <v-menu :close-on-content-click="false" :nudge-width="250" offset-y>
             <template v-slot:activator="{ on }">
-              <v-btn color="primary" dark v-on="on">LR Control</v-btn>
+              <v-btn color="primary" dark v-on="on">LR CTRL</v-btn>
             </template>
 
             <v-card class="py-3 px-3">
