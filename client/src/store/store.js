@@ -18,6 +18,7 @@ export default new Vuex.Store({
         channelSplitterNode: Object,
         mergerNode: Object,
         stereoPannerNode: Object,
+        peakings: [],
         audioElement: Object,
         currentSong: Object,
         p: Object,
@@ -135,6 +136,17 @@ export default new Vuex.Store({
         setPanValue(state, val) {
             state.stereoPannerNode.pan.value = val;
         },
+        setPeakings(state, peakings) {
+            state.peakings = peakings;
+        },
+        setPeakingGain(state, { index, gain }) {
+            state.peakings[index].gain.value = gain;
+        },
+        resetPeakingGain(state) {
+            state.peakings.forEach(function (peaking) {
+                peaking.gain.value = 0;
+            });
+        },
         setP(state, p) {
             state.p = p;
         }
@@ -153,6 +165,41 @@ export default new Vuex.Store({
             var mergerNode = audioContext.createChannelMerger(2);
             var stereoPannerNode = audioContext.createStereoPanner();
 
+            var NUM_BANDS = 10;
+            var peakings = new Array(NUM_BANDS);
+            // Center frequency
+            var frequency = 31.25;
+            for (var i = 0; i < NUM_BANDS; i++) {
+                // Create the instance of BiquadFilterNode
+                var peaking = audioContext.createBiquadFilter();
+                // Calculate center frequency
+                if (i !== 0) {
+                    frequency *= 2;
+                }
+                // Set parameters
+                peaking.type = (typeof peaking.type === 'string') ? 'peaking' : 5;
+                peaking.frequency.value = frequency;
+                peaking.Q.value = 2;
+                peaking.gain.value = 0;  // The default value
+                peakings[i] = peaking;
+            }
+
+            source.connect(gainNode);
+            gainNode.connect(peakings[0]);
+            peakings.forEach(function (peaking, index) {
+                if (index < (NUM_BANDS - 1)) {
+                    peaking.connect(peakings[index + 1]);
+                } else {
+                    peaking.connect(splitterNode);
+                }
+            });
+            splitterNode.connect(leftGainNode, 0);
+            splitterNode.connect(rightGainNode, 1);
+            leftGainNode.connect(mergerNode, 0, 0);
+            rightGainNode.connect(mergerNode, 0, 1);
+            mergerNode.connect(stereoPannerNode);
+            stereoPannerNode.connect(audioContext.destination);
+
             context.commit("setSourceNode", source);
             context.commit("setGainNode", { gainNode: gainNode, type: 'center' });
             context.commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
@@ -160,15 +207,7 @@ export default new Vuex.Store({
             context.commit("setSplitterNode", splitterNode);
             context.commit("setMergerNode", mergerNode);
             context.commit("setStereoPannerNode", stereoPannerNode);
-
-            source.connect(gainNode);
-            gainNode.connect(splitterNode);
-            splitterNode.connect(leftGainNode, 0);
-            splitterNode.connect(rightGainNode, 1);
-            leftGainNode.connect(mergerNode, 0, 0);
-            rightGainNode.connect(mergerNode, 0, 1);
-            mergerNode.connect(stereoPannerNode);
-            stereoPannerNode.connect(audioContext.destination);
+            context.commit("setPeakings", peakings);
         },
         playLoop(context, loop) {
             const p = context.state.p;
