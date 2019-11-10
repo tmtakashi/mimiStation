@@ -6,7 +6,7 @@
       <div class="flex-grow-1"></div>
 
       <template v-if="$vuetify.breakpoint.smAndUp">
-        <v-toolbar-items>
+        <v-toolbar-items v-if="isSignedIn && $route.name == 'player'">
           <v-btn @click.stop="$store.commit('toggleDrawer')" text>
             AB Loops
             <v-icon>mdi-repeat</v-icon>
