@@ -100,8 +100,7 @@ export default {
         method: "post",
         acceptedFiles: "audio/*",
         thumbnailWidth: 60,
-        dictDefaultMessage:
-          "<i class='fa fa-cloud-upload'></i>Upload songs (only .wav is supported)",
+        dictDefaultMessage: "Upload songs (only .wav and .mp3 is supported)",
         addRemoveLinks: "true",
         chunking: true,
         forceChunking: true,
