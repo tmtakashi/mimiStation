@@ -39,6 +39,9 @@
                 <td>
                   <v-btn color="success" @click="handleUpload(idx)">upload</v-btn>
                 </td>
+                <td>
+                  <v-btn color="red" @click="cancelUpload(idx)" dark>cancel</v-btn>
+                </td>
               </tr>
             </tbody>
           </v-simple-table>
@@ -100,8 +103,8 @@ export default {
         method: "post",
         acceptedFiles: "audio/wav, audio/mp3",
         thumbnailWidth: 60,
+        addRemoveLinks: true,
         dictDefaultMessage: "Upload songs (only .wav and .mp3 is supported)",
-        addRemoveLinks: "true",
         chunking: true,
         forceChunking: true,
         autoQueue: false,
@@ -125,6 +128,11 @@ export default {
         if (!value) {
           this.$emit("close");
         }
+      }
+    },
+    uploadDefaultMessage: {
+      get() {
+        return document.getElementsByClassName("dz-default dz-message")[0];
       }
     },
     ...mapGetters(["songSelected"])
@@ -196,6 +204,13 @@ export default {
           });
         }
       );
+    },
+    cancelUpload: function(idx) {
+      var removeLink = this.uploadForm[idx].file.previewElement.querySelector(
+        ".dz-remove"
+      );
+      removeLink.click();
+      this.uploadForm.splice(idx, 1);
     },
     handleDelete: function(idx, event) {
       event.stopPropagation();
