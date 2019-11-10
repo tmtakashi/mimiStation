@@ -17,7 +17,10 @@
           <SongList :visible="showSongList" @close="toggleSongList(false)"></SongList>
         </v-toolbar-items>
         <v-toolbar-items>
-          <v-btn v-if="!isSignedIn" to="/signup" text>Sign Up</v-btn>
+          <v-btn v-if="!isSignedIn  && $route.name == 'login'" to="/signup" text>Sign Up</v-btn>
+        </v-toolbar-items>
+        <v-toolbar-items>
+          <v-btn v-if="!isSignedIn && $route.name == 'signup'" to="/login" text>Login</v-btn>
         </v-toolbar-items>
         <v-toolbar-items>
           <v-btn v-if="isSignedIn" @click="logout" text>Logout</v-btn>
