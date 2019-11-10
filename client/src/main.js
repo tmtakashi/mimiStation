@@ -5,14 +5,13 @@ import App from './App.vue'
 import vuetify from './plugins/vuetify'
 import Firebase from "./firebase";
 import store from './store/store'
+
 Firebase.init();
 
 Vue.config.productionTip = false
-
-
-
 Vue.use(Vuex)
 
+document.title = "mimiCopy"
 let app = new Vue({
   vuetify,
   router,
