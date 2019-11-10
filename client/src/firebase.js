@@ -26,7 +26,7 @@ export default {
                 result = res;
             })
             .catch(error => {
-                console.log(error.message);
+                alert(error.message);
             });
         return result
     },
@@ -37,6 +37,8 @@ export default {
                 localStorage.setItem('jwt', idToken.toString())
             })
             result = res;
+        }).catch(function (err) {
+            alert(err.message);
         })
         return result;
     },

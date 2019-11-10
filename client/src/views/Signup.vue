@@ -77,19 +77,21 @@ export default {
   methods: {
     signup: async function() {
       var res = await Firebase.signup(this.email, this.password);
-      var db = Firebase.db();
-      db.collection("users")
-        .doc(res.user.uid)
-        .set({
-          email: res.user.email,
-          songs: []
-        })
-        .then(function(docRef) {
-          router.push("/");
-        })
-        .catch(function(error) {
-          console.error("Error adding document: ", error);
-        });
+      if (res) {
+        var db = Firebase.db();
+        db.collection("users")
+          .doc(res.user.uid)
+          .set({
+            email: res.user.email,
+            songs: []
+          })
+          .then(function(docRef) {
+            router.push("/");
+          })
+          .catch(function(error) {
+            console.error("Error adding document: ", error);
+          });
+      }
     },
     loginWithGoogle: async function() {
       var res = await Firebase.loginWithGoogle();
