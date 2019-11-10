@@ -98,7 +98,7 @@ export default {
       dropzoneOptions: {
         url: "/",
         method: "post",
-        acceptedFiles: "audio/*",
+        acceptedFiles: "audio/wav, audio/mp3",
         thumbnailWidth: 60,
         dictDefaultMessage: "Upload songs (only .wav and .mp3 is supported)",
         addRemoveLinks: "true",
