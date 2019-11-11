@@ -8,42 +8,38 @@
               <v-toolbar-title>Login</v-toolbar-title>
               <div class="flex-grow-1"></div>
             </v-toolbar>
-            <v-card-text>
-              <v-form>
-                <validation-provider name="Email" rules="required|email">
-                  <div slot-scope="{ errors }">
-                    <v-text-field v-model="email" label="Email" name="Email" type="text"></v-text-field>
-                    <span>{{ errors[0] }}</span>
-                  </div>
-                </validation-provider>
-                <validation-provider name="password" rules="required|max:15">
-                  <div slot-scope="{ errors }">
-                    <v-text-field
-                      v-model="password"
-                      label="Password"
-                      name="Password"
-                      type="password"
-                    ></v-text-field>
-                    <span>{{ errors[1] }}</span>
-                  </div>
-                </validation-provider>
-              </v-form>
-            </v-card-text>
-
-            <v-card-actions>
-              <div class="flex-grow-1"></div>
-
-              <v-btn @click="login" color="primary">Login</v-btn>
-              <div class="ml-5">
-                or
-                <img
-                  class="auth-btn"
-                  src="../assets/img/btn_google_signin_dark_normal_web@2x.png"
-                  width="175"
-                  v-on:click="loginWithGoogle"
-                />
-              </div>
-            </v-card-actions>
+            <v-form @submit.prevent="login">
+              <v-card-text>
+                <v-text-field
+                  v-model="email"
+                  label="Email"
+                  name="Email"
+                  type="email"
+                  :rules="emailRules"
+                  required
+                ></v-text-field>
+                <v-text-field
+                  v-model="password"
+                  label="Password"
+                  name="Password"
+                  type="password"
+                  required
+                ></v-text-field>
+              </v-card-text>
+              <v-card-actions>
+                <div class="flex-grow-1"></div>
+                <v-btn type="submit" color="primary">Login</v-btn>
+                <div class="ml-5">
+                  or
+                  <img
+                    class="auth-btn"
+                    src="../assets/img/btn_google_signin_dark_normal_web@2x.png"
+                    width="175"
+                    v-on:click="loginWithGoogle"
+                  />
+                </div>
+              </v-card-actions>
+            </v-form>
           </v-card>
         </v-col>
       </v-row>
@@ -70,13 +66,19 @@ export default {
   data: function() {
     return {
       email: "",
+      emailRules: [
+        v => !!v || "E-mail is required",
+        v => /.+@.+\..+/.test(v) || "E-mail must be valid"
+      ],
       password: ""
     };
   },
   methods: {
     login: async function() {
       var res = await Firebase.login(this.email, this.password);
-      this.createUserInDB(res);
+      if (res) {
+        this.createUserInDB(res);
+      }
     },
     loginWithGoogle: async function() {
       var res = await Firebase.loginWithGoogle();
