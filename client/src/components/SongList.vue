@@ -46,6 +46,7 @@
             </tbody>
           </v-simple-table>
           <vue-dropzone
+            class="mt-5"
             @vdropzone-file-added="vFileAdded"
             ref="dropzone"
             id="dropzone"
