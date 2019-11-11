@@ -7,7 +7,7 @@
         <v-card-text>
           <v-simple-table>
             <thead>
-              <tr>
+              <tr v-if="songList.length != 0 || uploadForm.length != 0">
                 <th>Artist</th>
                 <th>Title</th>
                 <th></th>
