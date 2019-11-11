@@ -6,13 +6,11 @@ import "firebase/firestore";
 import Dexie from "dexie";
 
 Vue.use(Vuex)
-var AudioContext = window.AudioContext || window.webkitAudioContext;
-
 export default new Vuex.Store({
     state: {
         user: {},
         status: false,
-        audioContext: new AudioContext(),
+        audioContext: new (window.AudioContext || window.webkitAudioContext),
         sourceNode: Object,
         gainNode: Object,
         leftGainNode: Object,
