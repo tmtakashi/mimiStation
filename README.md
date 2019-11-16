@@ -1,5 +1,6 @@
 ![demo](https://github.com/tmtakashi/mimicopy/blob/media/demo.gif)
-# mimiCopy
+
+#  mimiCopy
 
 A Vue.js web appication makes music transcribers' lives easier.
 (currently only supports Chrome)
@@ -9,3 +10,22 @@ A Vue.js web appication makes music transcribers' lives easier.
 Email: example@example.com
 
 Password: passwordpassword
+
+## Project Setup
+
+### With docker-compose
+
+```
+git clone https://github.com/tmtakashi/mimicopy.git
+cd mimicopy
+docker-compose up -d
+```
+
+### Without docker
+
+```
+git clone https://github.com/tmtakashi/mimicopy.git
+cd mimicopy/client
+npm install
+npm run serve
+```
