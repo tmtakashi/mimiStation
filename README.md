@@ -5,6 +5,8 @@
 A Vue.js web appication makes music transcribers' lives easier.
 (currently only supports Chrome)
 
+URL: https://mimicopy.firebaseapp.com/
+
 **Demo User**
 
 Email: example@example.com
