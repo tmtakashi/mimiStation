@@ -10,7 +10,7 @@
       <v-layout row>
         <v-flex>
           <v-text-field
-            @keydown.enter="addABLoop"
+            @keydown.enter="addABLoop($event)"
             @focus="$store.commit('changeEditMode', true)"
             v-model="ABLoopName"
             label="Name"
@@ -18,7 +18,7 @@
             clearable
             solo
           ></v-text-field>
-          <v-btn color="success" style="float: right;" @click="addABLoop" large icon>
+          <v-btn color="success" style="float: right;" @click="addABLoop($event)" large icon>
             <v-icon>mdi-plus-circle</v-icon>
           </v-btn>
         </v-flex>
@@ -68,6 +68,11 @@ export default {
       if (val == true && this.markedPointA == true) {
         this.bothABMarked = true;
       }
+    },
+    bothABMarked(newVal, oldVal) {
+      if (newVal != oldVal) {
+        this.$store.commit("changeEditMode", newVal);
+      } else return;
     }
   },
   methods: {
@@ -78,12 +83,12 @@ export default {
 
       return [minutes, seconds].map(v => (v < 10 ? "0" + v : v)).join(":");
     },
-    addABLoop: function() {
+    addABLoop: function(event) {
+      event.stopPropagation();
       this.$store.dispatch("addABLoop", this.ABLoopName);
       this.ABLoopName = "";
       this.$store.commit("toggleMarkedPointA");
       this.$store.commit("toggleMarkedPointB");
-      this.$store.commit("changeEditMode", false);
       this.bothABMarked = false;
     },
     ...mapActions(["playLoop", "deleteABLoop"])
