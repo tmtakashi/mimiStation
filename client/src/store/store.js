@@ -223,17 +223,30 @@ export default new Vuex.Store({
             context.commit("setPointATime", 0);
             context.commit("setPointBTime", 0);
         },
-        addABLoop(context, labelText) {
-            const segment = {
-                startTime: context.state.pointATime,
-                endTime: context.state.pointBTime,
-                labelText: labelText,
-                editable: true
-            };
-            const p = context.state.p;
-            p.segments.add(segment);
-            context.state.ABLoops = p.segments.getSegments();
-            p.points.removeAll();
+        addABLoop(context, { labelText, songList }) {
+            return new Promise((resolve, reject) => {
+                const segment = {
+                    startTime: context.state.pointATime,
+                    endTime: context.state.pointBTime,
+                    labelText: labelText,
+                    editable: true
+                };
+                let db = firebase.firestore();
+                let userUid = context.state.user.uid;
+                let songIdx = songList.findIndex(song => song.path === context.state.currentSong.path);
+                songList[songIdx].ABLoops ? songList[songIdx].ABLoops.push(segment) : songList[songIdx].ABLoops = [segment];
+                db.collection("users")
+                    .doc(userUid)
+                    .update({
+                        songs: songList
+                    }).then(() => {
+                        const p = context.state.p;
+                        p.segments.add(segment);
+                        context.state.ABLoops = p.segments.getSegments();
+                        p.points.removeAll();
+                    })
+                resolve();
+            })
         },
         setSource(context, path) {
             context.commit("toggleLoading", true);

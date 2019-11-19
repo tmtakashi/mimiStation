@@ -14,7 +14,11 @@
         </v-toolbar-items>
         <v-toolbar-items v-if="isSignedIn && $route.name == 'player'">
           <v-btn @click.stop="toggleSongList(true)" text>Songs</v-btn>
-          <SongList :visible="showSongList" @close="toggleSongList(false)"></SongList>
+          <SongList
+            v-on:changeSongList="changeSongList"
+            :visible="showSongList"
+            @close="toggleSongList(false)"
+          ></SongList>
         </v-toolbar-items>
         <v-toolbar-items>
           <v-btn v-if="!isSignedIn  && $route.name == 'login'" to="/signup" text>Sign Up</v-btn>
@@ -53,6 +57,9 @@ export default {
     },
     toggleSongList: function(bool) {
       this.$store.commit("toggleSongList", bool);
+    },
+    changeSongList: function(songList) {
+      this.$emit("changeSongList", songList);
     }
   }
 };

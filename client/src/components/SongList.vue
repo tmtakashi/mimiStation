@@ -119,6 +119,11 @@ export default {
   components: {
     vueDropzone: vue2Dropzone
   },
+  watch: {
+    songList: function(val) {
+      this.$emit("changeSongList", this.songList);
+    }
+  },
   props: ["visible"],
   computed: {
     show: {
