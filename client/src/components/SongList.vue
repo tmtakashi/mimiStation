@@ -307,8 +307,8 @@ export default {
       this.songListEdit[idx].name = event.target.innerText;
     },
     changeSong: async function(idx) {
-      let path = this.songList[idx].path;
-      await this.$store.dispatch("setSource", path);
+      let song = this.songList[idx];
+      await this.$store.dispatch("setSource", song);
       this.$emit("close");
       this.$store.commit("setCurrentSong", this.songList[idx]);
     }
