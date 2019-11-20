@@ -229,7 +229,8 @@ export default new Vuex.Store({
                     startTime: context.state.pointATime,
                     endTime: context.state.pointBTime,
                     labelText: labelText,
-                    editable: true
+                    editable: true,
+                    id: context.state.ABLoops.length + 1
                 };
                 const p = context.state.p;
                 p.segments.add(segment);
