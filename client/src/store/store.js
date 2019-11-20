@@ -223,22 +223,49 @@ export default new Vuex.Store({
             context.commit("setPointATime", 0);
             context.commit("setPointBTime", 0);
         },
-        addABLoop(context, labelText) {
-            const segment = {
-                startTime: context.state.pointATime,
-                endTime: context.state.pointBTime,
-                labelText: labelText,
-                editable: true
-            };
-            const p = context.state.p;
-            p.segments.add(segment);
-            context.state.ABLoops = p.segments.getSegments();
-            p.points.removeAll();
+        addABLoop(context, { labelText, songList }) {
+            return new Promise((resolve, reject) => {
+                const segment = {
+                    startTime: context.state.pointATime,
+                    endTime: context.state.pointBTime,
+                    labelText: labelText,
+                    editable: true,
+                    id: context.state.ABLoops.length + 1
+                };
+                const p = context.state.p;
+                p.segments.add(segment);
+                const segments = p.segments.getSegments()
+                // convert segment object into firebase handlable object
+                context.state.ABLoops = segments.map(segment => {
+                    return {
+                        color: segment.color,
+                        editable: segment.editable,
+                        endTime: segment.endTime,
+                        id: segment.id,
+                        labelText: segment.labelText,
+                        startTime: segment.startTime
+                    }
+                });
+                let db = firebase.firestore();
+                let userUid = context.state.user.uid;
+                let songIdx = songList.findIndex(song => song.path === context.state.currentSong.path);
+                songList[songIdx].ABLoops = context.state.ABLoops;
+                db.collection("users")
+                    .doc(userUid)
+                    .update({
+                        songs: songList
+                    }).then(() => {
+                        p.points.removeAll();
+                    })
+                resolve();
+            })
         },
-        setSource(context, path) {
+        setSource(context, song) {
             context.commit("toggleLoading", true);
             var audioContext = context.state.audioContext;
             var storageRef = firebase.storage().ref();
+            var path = song.path;
+            var segments = song.ABLoops;
             storageRef.child(path).getDownloadURL().then(function (url) {
                 var request = new XMLHttpRequest();
                 request.open('GET', url, true);
@@ -252,23 +279,16 @@ export default new Vuex.Store({
                             mediaUrl: dataURL,
                             webAudio: {
                                 audioContext: audioContext
-                            },
+                            }
                         };
-                        context.state.p.setSource(options, async function (error) {
+                        context.state.p.setSource(options, function (error) {
                             context.commit("toggleLoading", false)
                             if (!context.state.songSelected) {
                                 context.commit("toggleSongSelected", true);
                             }
-                            const indexedDB = new Dexie('audioDB');
-                            indexedDB.version(1).stores({
-                                audioFiles: 'id, dataURL'
-                            });
-                            indexedDB.audioFiles.delete(0).then(async function () {
-                                await indexedDB.audioFiles.add({
-                                    id: 0,
-                                    dataURL: dataURL
-                                });
-                            });
+                            // Set ABLoops
+                            context.state.p.segments.add(segments);
+                            context.state.ABLoops = segments;
                         });
                     };
                 };

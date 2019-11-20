@@ -1,7 +1,7 @@
 <template>
   <v-app>
-    <Navbar></Navbar>
-    <Sidebar></Sidebar>
+    <Navbar v-on:changeSongList="changeSongList"></Navbar>
+    <Sidebar :songList="songList"></Sidebar>
     <v-content>
       <router-view />
     </v-content>
@@ -27,6 +27,14 @@ export default {
   },
   computed: {
     ...mapGetters(["isLoading"])
+  },
+  data: function() {
+    return { songList: [] };
+  },
+  methods: {
+    changeSongList: function(songList) {
+      this.songList = songList;
+    }
   }
 };
 </script>

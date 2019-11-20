@@ -1,6 +1,6 @@
 <template>
   <v-navigation-drawer :value="drawer" app clipped left>
-    <v-list-item v-if="ABLoops.length == 0">
+    <v-list-item v-if="ABLoops.length === 0">
       <v-list-item-content>
         <v-list-item-title>You have no AB Loops!</v-list-item-title>
         <v-list-item-subtitle>Add a loop with the AB buttons.</v-list-item-subtitle>
@@ -27,7 +27,7 @@
 
     <v-divider></v-divider>
 
-    <v-list>
+    <v-list v-if="ABLoops">
       <draggable v-model="ABLoops" class="v-list__container" handle=".handle">
         <v-list-item v-for="(loop, index) in ABLoops" :key="index" two-line link>
           <v-icon class="mr-5 handle">mdi-reorder-horizontal</v-icon>
@@ -54,6 +54,7 @@ export default {
   components: {
     draggable
   },
+  props: ["songList"],
   data: function() {
     return {
       ABLoopName: "",
@@ -85,11 +86,17 @@ export default {
     },
     addABLoop: function(event) {
       event.stopPropagation();
-      this.$store.dispatch("addABLoop", this.ABLoopName);
-      this.ABLoopName = "";
-      this.$store.commit("toggleMarkedPointA");
-      this.$store.commit("toggleMarkedPointB");
-      this.bothABMarked = false;
+      this.$store
+        .dispatch("addABLoop", {
+          labelText: this.ABLoopName,
+          songList: this.songList
+        })
+        .then(() => {
+          this.ABLoopName = "";
+          this.$store.commit("toggleMarkedPointA");
+          this.$store.commit("toggleMarkedPointB");
+          this.bothABMarked = false;
+        });
     },
     ...mapActions(["playLoop", "deleteABLoop"])
   }
