@@ -36,7 +36,7 @@
             <v-list-item-subtitle>{{ toMMSS(loop.startTime) }} - {{ toMMSS(loop.endTime) }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action>
-            <v-btn @click="deleteABLoop(loop)" icon>
+            <v-btn @click="deleteABLoop({loop: loop, songList: songList})" icon>
               <v-icon color="red">mdi-delete-circle</v-icon>
             </v-btn>
           </v-list-item-action>

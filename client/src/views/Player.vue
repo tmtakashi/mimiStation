@@ -270,9 +270,10 @@ export default {
       e.preventDefault();
       let icon = document.getElementById("play-icon");
       if (this.audioElement.paused) {
-        this.audioElement.play();
-        icon.classList.remove("mdi-play");
-        icon.classList.add("mdi-pause");
+        this.audioElement.play().then(() => {
+          icon.classList.remove("mdi-play");
+          icon.classList.add("mdi-pause");
+        });
       } else {
         this.audioElement.pause();
         icon.classList.remove("mdi-pause");

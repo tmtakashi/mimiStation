@@ -161,6 +161,7 @@ export default {
       await this.storageUpload(file, function(res) {
         res.artist = artist;
         res.name = name;
+        res.ABLoops = [];
         res.editing = false;
         // add file path to db
         let db = firebase.firestore();

@@ -216,12 +216,23 @@ export default new Vuex.Store({
             context.commit("setPointBTime", segment.endTime);
             p.player.seek(segment.startTime);
         },
-        deleteABLoop(context, loop) {
+        deleteABLoop(context, { loop, songList }) {
             const p = context.state.p;
             p.segments.removeById(loop.id);
             context.state.ABLoops = p.segments.getSegments();
-            context.commit("setPointATime", 0);
-            context.commit("setPointBTime", 0);
+            let db = firebase.firestore();
+            let userUid = context.state.user.uid;
+            let songIdx = songList.findIndex(song => song.path === context.state.currentSong.path);
+            songList[songIdx].ABLoops = context.state.ABLoops;
+            db.collection("users")
+                .doc(userUid)
+                .update({
+                    songs: songList
+                }).then(() => {
+                    context.commit("setPointATime", 0);
+                    context.commit("setPointBTime", 0);
+                })
+
         },
         addABLoop(context, { labelText, songList }) {
             return new Promise((resolve, reject) => {
@@ -290,6 +301,9 @@ export default new Vuex.Store({
                             context.state.p.segments.add(segments);
                             context.state.ABLoops = segments;
                         });
+                        if (context.state.audioContext.state != 'running') {
+                            context.state.audioContext.resume();
+                        }
                     };
                 };
                 request.send();
