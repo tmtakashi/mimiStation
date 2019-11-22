@@ -1,11 +1,11 @@
 ![demo](https://github.com/tmtakashi/mimicopy/blob/media/demo.gif)
 
-#  mimiCopy
+#  mimiStation
 
 A Vue.js web appication makes music transcribers' lives easier.
 (currently only supports Chrome)
 
-URL: https://mimicopy.firebaseapp.com/
+URL: mimistation.me
 
 **Demo User**
 
@@ -18,16 +18,16 @@ Password: passwordpassword
 ### With docker-compose
 
 ```
-git clone https://github.com/tmtakashi/mimicopy.git
-cd mimicopy
+git clone https://github.com/tmtakashi/mimistation.git
+cd mimistation
 docker-compose up -d
 ```
 
 ### Without docker
 
 ```
-git clone https://github.com/tmtakashi/mimicopy.git
-cd mimicopy/client
+git clone https://github.com/tmtakashi/mimistation.git
+cd mimistation/client
 npm install
 npm run serve
 ```
