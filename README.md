@@ -1,11 +1,11 @@
-![demo](https://github.com/tmtakashi/mimicopy/blob/media/demo.gif)
+![demo](https://github.com/tmtakashi/mimistation/blob/media/demo.gif)
 
 #  mimiStation
 
 A Vue.js web appication makes music transcribers' lives easier.
 (currently only supports Chrome)
 
-URL: mimistation.me
+URL: https://mimistation.me/ 
 
 **Demo User**
 
