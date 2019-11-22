@@ -155,7 +155,6 @@ export default new Vuex.Store({
         initializeP(context, options) {
             context.commit("setP", peaks.init(options));
             var p = context.state.p;
-            p.zoom.setZoom(2)
             var audioContext = context.state.audioContext;
             var source = audioContext.createMediaElementSource(p.player._mediaElement)
             var gainNode = audioContext.createGain();
