@@ -11,7 +11,6 @@ Firebase.init();
 Vue.config.productionTip = false
 Vue.use(Vuex)
 
-document.title = "mimiCopy"
 let app = new Vue({
   vuetify,
   router,

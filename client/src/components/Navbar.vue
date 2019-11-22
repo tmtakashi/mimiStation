@@ -1,10 +1,8 @@
 <template>
   <div>
     <v-app-bar color="primary" clipped-left app dark>
-      <v-toolbar-title>mimiCopy</v-toolbar-title>
-
+      <v-toolbar-title>mimiStation</v-toolbar-title>
       <div class="flex-grow-1"></div>
-
       <template v-if="$vuetify.breakpoint.smAndUp">
         <v-toolbar-items v-if="isSignedIn && $route.name == 'player'">
           <v-btn @click.stop="$store.commit('toggleDrawer')" text>
