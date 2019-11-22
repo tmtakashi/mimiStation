@@ -153,6 +153,16 @@ export default {
       this.$store.commit("changeEditMode", true);
     },
     async handleUpload(idx) {
+      if (!this.uploadForm[idx].name && !this.uploadForm[idx].artist) {
+        alert("You can't leave the song name and artist name empty!");
+        return;
+      } else if (!this.uploadForm[idx].name) {
+        alert("You can't leave the song name empty!");
+        return;
+      } else if (!this.uploadForm[idx].artist) {
+        alert("You can't leave the artist name empty!");
+        return;
+      }
       this.$store.commit("changeEditMode", false);
       let self = this;
       let file = this.uploadForm[idx].file;
