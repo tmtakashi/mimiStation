@@ -3,7 +3,7 @@
     <v-row class>
       <v-col v-for="(fc, index) in centerFreqs" :key="index">
         <v-row align-center>
-          <label>{{ fc }}</label>
+          <label>{{ fc | addPrefix }}</label>
         </v-row>
         <v-row>
           <v-slider :min="-12" :max="12" v-model="dBs[index]" vertical></v-slider>
@@ -22,10 +22,15 @@ export default {
   data: function() {
     return {
       centerFreqs: Array.apply(null, new Array(10)).map(function(v, i) {
-        return unit(31.25 * Math.pow(2, i), "Hz");
+        return 31.25 * Math.pow(2, i);
       }),
       dBs: new Array(10).fill(0)
     };
+  },
+  filters: {
+    addPrefix: function(value) {
+      return unit(value, "Hz");
+    }
   },
   computed: {
     //   for watching dBs
