@@ -308,8 +308,8 @@ export default new Vuex.Store({
                 request.send();
             });
         },
-        changePlaybackRate(context, rate) {
-            context.state.p.player._mediaElement.playbackRate = rate;
+        changePlaybackRate({ state }, rate) {
+            state.p.player._mediaElement.playbackRate = rate;
         },
     }
 });
