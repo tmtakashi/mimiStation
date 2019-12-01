@@ -1,4 +1,4 @@
-![demo](https://github.com/tmtakashi/mimistation/blob/media/demo.gif)
+![demo](https://github.com/tmtakashi/mimiStation/blob/media/demo.gif)
 
 #  mimiStation
 
@@ -18,16 +18,16 @@ Password: passwordpassword
 ### With docker-compose
 
 ```
-git clone https://github.com/tmtakashi/mimistation.git
-cd mimistation
+git clone https://github.com/tmtakashi/mimiStation.git
+cd mimiStation
 docker-compose up -d
 ```
 
 ### Without docker
 
 ```
-git clone https://github.com/tmtakashi/mimistation.git
-cd mimistation/client
+git clone https://github.com/tmtakashi/mimiStation.git
+cd mimiStation/client
 npm install
 npm run serve
 ```

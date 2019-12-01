@@ -152,10 +152,10 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        initializeP(context, options) {
-            context.commit("setP", peaks.init(options));
-            var p = context.state.p;
-            var audioContext = context.state.audioContext;
+        initializeP({ state, commit }, options) {
+            commit("setP", peaks.init(options));
+            var p = state.p;
+            var audioContext = state.audioContext;
             var source = audioContext.createMediaElementSource(p.player._mediaElement)
             var gainNode = audioContext.createGain();
             var leftGainNode = audioContext.createGain();
@@ -199,54 +199,54 @@ export default new Vuex.Store({
             mergerNode.connect(stereoPannerNode);
             stereoPannerNode.connect(audioContext.destination);
 
-            context.commit("setSourceNode", source);
-            context.commit("setGainNode", { gainNode: gainNode, type: 'center' });
-            context.commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
-            context.commit("setGainNode", { gainNode: rightGainNode, type: 'right' });
-            context.commit("setSplitterNode", splitterNode);
-            context.commit("setMergerNode", mergerNode);
-            context.commit("setStereoPannerNode", stereoPannerNode);
-            context.commit("setPeakings", peakings);
+            commit("setSourceNode", source);
+            commit("setGainNode", { gainNode: gainNode, type: 'center' });
+            commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
+            commit("setGainNode", { gainNode: rightGainNode, type: 'right' });
+            commit("setSplitterNode", splitterNode);
+            commit("setMergerNode", mergerNode);
+            commit("setStereoPannerNode", stereoPannerNode);
+            commit("setPeakings", peakings);
         },
-        playLoop(context, loop) {
-            const p = context.state.p;
+        playLoop({ state, commit }, loop) {
+            const p = state.p;
             const segment = p.segments.getSegment(loop.id);
-            context.commit("setPointATime", segment.startTime);
-            context.commit("setPointBTime", segment.endTime);
+            commit("setPointATime", segment.startTime);
+            commit("setPointBTime", segment.endTime);
             p.player.seek(segment.startTime);
         },
-        deleteABLoop(context, { loop, songList }) {
-            const p = context.state.p;
+        deleteABLoop({ state, commit }, { loop, songList }) {
+            const p = state.p;
             p.segments.removeById(loop.id);
-            context.state.ABLoops = p.segments.getSegments();
+            state.ABLoops = p.segments.getSegments();
             let db = firebase.firestore();
-            let userUid = context.state.user.uid;
-            let songIdx = songList.findIndex(song => song.path === context.state.currentSong.path);
-            songList[songIdx].ABLoops = context.state.ABLoops;
+            let userUid = state.user.uid;
+            let songIdx = songList.findIndex(song => song.path === state.currentSong.path);
+            songList[songIdx].ABLoops = state.ABLoops;
             db.collection("users")
                 .doc(userUid)
                 .update({
                     songs: songList
                 }).then(() => {
-                    context.commit("setPointATime", 0);
-                    context.commit("setPointBTime", 0);
+                    commit("setPointATime", 0);
+                    commit("setPointBTime", 0);
                 })
 
         },
-        addABLoop(context, { labelText, songList }) {
+        addABLoop({ state }, { labelText, songList }) {
             return new Promise((resolve, reject) => {
                 const segment = {
-                    startTime: context.state.pointATime,
-                    endTime: context.state.pointBTime,
+                    startTime: state.pointATime,
+                    endTime: state.pointBTime,
                     labelText: labelText,
                     editable: true,
-                    id: context.state.ABLoops.length + 1
+                    id: state.ABLoops.length + 1
                 };
-                const p = context.state.p;
+                const p = state.p;
                 p.segments.add(segment);
                 const segments = p.segments.getSegments()
                 // convert segment object into firebase handlable object
-                context.state.ABLoops = segments.map(segment => {
+                state.ABLoops = segments.map(segment => {
                     return {
                         color: segment.color,
                         editable: segment.editable,
@@ -257,9 +257,9 @@ export default new Vuex.Store({
                     }
                 });
                 let db = firebase.firestore();
-                let userUid = context.state.user.uid;
-                let songIdx = songList.findIndex(song => song.path === context.state.currentSong.path);
-                songList[songIdx].ABLoops = context.state.ABLoops;
+                let userUid = state.user.uid;
+                let songIdx = songList.findIndex(song => song.path === state.currentSong.path);
+                songList[songIdx].ABLoops = state.ABLoops;
                 db.collection("users")
                     .doc(userUid)
                     .update({
@@ -270,9 +270,9 @@ export default new Vuex.Store({
                 resolve();
             })
         },
-        setSource(context, song) {
-            context.commit("toggleLoading", true);
-            var audioContext = context.state.audioContext;
+        setSource({ state, commit }, song) {
+            commit("toggleLoading", true);
+            var audioContext = state.audioContext;
             var storageRef = firebase.storage().ref();
             var path = song.path;
             var segments = song.ABLoops;
@@ -291,25 +291,25 @@ export default new Vuex.Store({
                                 audioContext: audioContext
                             }
                         };
-                        context.state.p.setSource(options, function (error) {
-                            context.commit("toggleLoading", false)
-                            if (!context.state.songSelected) {
-                                context.commit("toggleSongSelected", true);
+                        state.p.setSource(options, function (error) {
+                            commit("toggleLoading", false)
+                            if (!state.songSelected) {
+                                commit("toggleSongSelected", true);
                             }
                             // Set ABLoops
-                            context.state.p.segments.add(segments);
-                            context.state.ABLoops = segments;
+                            state.p.segments.add(segments);
+                            state.ABLoops = segments;
                         });
-                        if (context.state.audioContext.state != 'running') {
-                            context.state.audioContext.resume();
+                        if (state.audioContext.state != 'running') {
+                            state.audioContext.resume();
                         }
                     };
                 };
                 request.send();
             });
         },
-        changePlaybackRate(context, rate) {
-            context.state.p.player._mediaElement.playbackRate = rate;
+        changePlaybackRate({ state }, rate) {
+            state.p.player._mediaElement.playbackRate = rate;
         },
     }
 });
