@@ -270,9 +270,9 @@ export default new Vuex.Store({
                 resolve();
             })
         },
-        setSource(context, song) {
-            context.commit("toggleLoading", true);
-            var audioContext = context.state.audioContext;
+        setSource({ state, commit }, song) {
+            commit("toggleLoading", true);
+            var audioContext = state.audioContext;
             var storageRef = firebase.storage().ref();
             var path = song.path;
             var segments = song.ABLoops;
@@ -291,17 +291,17 @@ export default new Vuex.Store({
                                 audioContext: audioContext
                             }
                         };
-                        context.state.p.setSource(options, function (error) {
-                            context.commit("toggleLoading", false)
-                            if (!context.state.songSelected) {
-                                context.commit("toggleSongSelected", true);
+                        state.p.setSource(options, function (error) {
+                            commit("toggleLoading", false)
+                            if (!state.songSelected) {
+                                commit("toggleSongSelected", true);
                             }
                             // Set ABLoops
-                            context.state.p.segments.add(segments);
-                            context.state.ABLoops = segments;
+                            state.p.segments.add(segments);
+                            state.ABLoops = segments;
                         });
-                        if (context.state.audioContext.state != 'running') {
-                            context.state.audioContext.resume();
+                        if (state.audioContext.state != 'running') {
+                            state.audioContext.resume();
                         }
                     };
                 };
