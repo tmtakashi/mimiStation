@@ -215,21 +215,21 @@ export default new Vuex.Store({
             commit("setPointBTime", segment.endTime);
             p.player.seek(segment.startTime);
         },
-        deleteABLoop(context, { loop, songList }) {
-            const p = context.state.p;
+        deleteABLoop({ state, commit }, { loop, songList }) {
+            const p = state.p;
             p.segments.removeById(loop.id);
-            context.state.ABLoops = p.segments.getSegments();
+            state.ABLoops = p.segments.getSegments();
             let db = firebase.firestore();
-            let userUid = context.state.user.uid;
-            let songIdx = songList.findIndex(song => song.path === context.state.currentSong.path);
-            songList[songIdx].ABLoops = context.state.ABLoops;
+            let userUid = state.user.uid;
+            let songIdx = songList.findIndex(song => song.path === state.currentSong.path);
+            songList[songIdx].ABLoops = state.ABLoops;
             db.collection("users")
                 .doc(userUid)
                 .update({
                     songs: songList
                 }).then(() => {
-                    context.commit("setPointATime", 0);
-                    context.commit("setPointBTime", 0);
+                    commit("setPointATime", 0);
+                    commit("setPointBTime", 0);
                 })
 
         },
