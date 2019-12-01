@@ -208,11 +208,11 @@ export default new Vuex.Store({
             commit("setStereoPannerNode", stereoPannerNode);
             commit("setPeakings", peakings);
         },
-        playLoop(context, loop) {
-            const p = context.state.p;
+        playLoop({ state, commit }, loop) {
+            const p = state.p;
             const segment = p.segments.getSegment(loop.id);
-            context.commit("setPointATime", segment.startTime);
-            context.commit("setPointBTime", segment.endTime);
+            commit("setPointATime", segment.startTime);
+            commit("setPointBTime", segment.endTime);
             p.player.seek(segment.startTime);
         },
         deleteABLoop(context, { loop, songList }) {
