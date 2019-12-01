@@ -152,10 +152,10 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        initializeP(context, options) {
-            context.commit("setP", peaks.init(options));
-            var p = context.state.p;
-            var audioContext = context.state.audioContext;
+        initializeP({ state, commit }, options) {
+            commit("setP", peaks.init(options));
+            var p = state.p;
+            var audioContext = state.audioContext;
             var source = audioContext.createMediaElementSource(p.player._mediaElement)
             var gainNode = audioContext.createGain();
             var leftGainNode = audioContext.createGain();
@@ -199,14 +199,14 @@ export default new Vuex.Store({
             mergerNode.connect(stereoPannerNode);
             stereoPannerNode.connect(audioContext.destination);
 
-            context.commit("setSourceNode", source);
-            context.commit("setGainNode", { gainNode: gainNode, type: 'center' });
-            context.commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
-            context.commit("setGainNode", { gainNode: rightGainNode, type: 'right' });
-            context.commit("setSplitterNode", splitterNode);
-            context.commit("setMergerNode", mergerNode);
-            context.commit("setStereoPannerNode", stereoPannerNode);
-            context.commit("setPeakings", peakings);
+            commit("setSourceNode", source);
+            commit("setGainNode", { gainNode: gainNode, type: 'center' });
+            commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
+            commit("setGainNode", { gainNode: rightGainNode, type: 'right' });
+            commit("setSplitterNode", splitterNode);
+            commit("setMergerNode", mergerNode);
+            commit("setStereoPannerNode", stereoPannerNode);
+            commit("setPeakings", peakings);
         },
         playLoop(context, loop) {
             const p = context.state.p;
