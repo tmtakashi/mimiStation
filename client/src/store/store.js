@@ -233,20 +233,20 @@ export default new Vuex.Store({
                 })
 
         },
-        addABLoop(context, { labelText, songList }) {
+        addABLoop({ state }, { labelText, songList }) {
             return new Promise((resolve, reject) => {
                 const segment = {
-                    startTime: context.state.pointATime,
-                    endTime: context.state.pointBTime,
+                    startTime: state.pointATime,
+                    endTime: state.pointBTime,
                     labelText: labelText,
                     editable: true,
-                    id: context.state.ABLoops.length + 1
+                    id: state.ABLoops.length + 1
                 };
-                const p = context.state.p;
+                const p = state.p;
                 p.segments.add(segment);
                 const segments = p.segments.getSegments()
                 // convert segment object into firebase handlable object
-                context.state.ABLoops = segments.map(segment => {
+                state.ABLoops = segments.map(segment => {
                     return {
                         color: segment.color,
                         editable: segment.editable,
@@ -257,9 +257,9 @@ export default new Vuex.Store({
                     }
                 });
                 let db = firebase.firestore();
-                let userUid = context.state.user.uid;
-                let songIdx = songList.findIndex(song => song.path === context.state.currentSong.path);
-                songList[songIdx].ABLoops = context.state.ABLoops;
+                let userUid = state.user.uid;
+                let songIdx = songList.findIndex(song => song.path === state.currentSong.path);
+                songList[songIdx].ABLoops = state.ABLoops;
                 db.collection("users")
                     .doc(userUid)
                     .update({
