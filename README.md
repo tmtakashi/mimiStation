@@ -31,3 +31,8 @@ cd mimiStation/client
 npm install
 npm run serve
 ```
+
+## TODO
+
+- Write unit tests (atleast for authentications)
+- Redesign components and data flows
