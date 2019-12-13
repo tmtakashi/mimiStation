@@ -5,7 +5,7 @@ import "firebase/auth"
 import Player from './views/Player.vue'
 import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
-import store from './store/store'
+import store from './store/index'
 
 Vue.use(Router)
 

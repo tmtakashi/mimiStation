@@ -4,7 +4,7 @@ import router from './router'
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
 import Firebase from "./firebase";
-import store from './store/store'
+import store from './store/index'
 
 Firebase.init();
 
