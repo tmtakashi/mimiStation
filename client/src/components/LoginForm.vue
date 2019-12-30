@@ -18,7 +18,12 @@
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn type="submit" color="primary">Login</v-btn>
+        <v-btn
+          type="submit"
+          color="primary"
+          @click="handleClick"
+          :disabled="disableLoginAction"
+        >Login</v-btn>
         <div class="ml-5">
           or
           <img
@@ -35,19 +40,22 @@
 
 <script>
 import Firebase from "./../firebase";
-import { ValidationProvider, extend } from "vee-validate";
-import { required, email, max } from "vee-validate/dist/rules";
 import router from "../router";
 
-extend("required", {
-  ...required,
-  message: "The {_field_} field is required"
-});
-extend("email", email);
-extend("max", max);
+// regular expression for email validation
+const REGEX_EMAIL = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+// function checks if the value is empty
+const required = val => !!val.trim();
+
 export default {
   components: {
     ValidationProvider
+  },
+  props: {
+    onlogin: {
+      type: Function,
+      required: true
+    }
   },
   data: function() {
     return {
@@ -56,8 +64,42 @@ export default {
         v => !!v || "E-mail is required",
         v => /.+@.+\..+/.test(v) || "E-mail must be valid"
       ],
-      password: ""
+      password: "",
+      progress: false,
+      error: ""
     };
+  },
+  computed: {
+    validation() {
+      return {
+        email: {
+          required: required(this.email),
+          format: REGEX_EMAIL.test(this.email)
+        },
+        password: {
+          required: required(this.password)
+        }
+      };
+    },
+    valid() {
+      const validation = this.validation;
+      const fields = Object.keys(validation);
+      let valid = true;
+      // check if all fields are valid
+      for (let i = 0; i < fields.length; i++) {
+        const field = fields[i];
+        valid = Object.keys(validation[field]).every(
+          key => validation[field][key]
+        );
+        if (!valid) {
+          break;
+        }
+      }
+      return valid;
+    }
+  },
+  disableLoginAction() {
+    return !this.valid || this.progress;
   },
   methods: {
     login: async function() {
@@ -94,6 +136,24 @@ export default {
             router.push("/");
           }
         });
+    },
+    handleClick(e) {
+      if (this.disableLoginAction) {
+        return;
+      }
+
+      this.progress = true;
+      this.error = "";
+
+      this.$nextTick(() => {
+        this.onlogin({ email: this.email, password: this.password })
+          .catch(err => {
+            this.error = err.message;
+          })
+          .then(() => {
+            this.progress = false;
+          });
+      });
     }
   }
 };
