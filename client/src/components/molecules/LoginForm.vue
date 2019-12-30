@@ -93,10 +93,10 @@ export default {
         }
       }
       return valid;
+    },
+    disableLoginAction() {
+      return !this.valid || this.progress;
     }
-  },
-  disableLoginAction() {
-    return !this.valid || this.progress;
   },
   methods: {
     login: async function() {
