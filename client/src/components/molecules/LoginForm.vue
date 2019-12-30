@@ -28,7 +28,7 @@
           or
           <img
             class="auth-btn"
-            src="../assets/img/btn_google_signin_dark_normal_web@2x.png"
+            src="@/assets/img/btn_google_signin_dark_normal_web@2x.png"
             width="175"
             v-on:click="loginWithGoogle"
           />
@@ -39,8 +39,8 @@
 </template>
 
 <script>
-import Firebase from "./../firebase";
-import router from "../router";
+import Firebase from "@/firebase";
+import router from "@/router";
 
 // regular expression for email validation
 const REGEX_EMAIL = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -48,9 +48,6 @@ const REGEX_EMAIL = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))
 const required = val => !!val.trim();
 
 export default {
-  components: {
-    ValidationProvider
-  },
   props: {
     onlogin: {
       type: Function,
