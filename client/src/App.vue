@@ -11,7 +11,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import store from "@/store/store.js";
+import store from "@/store/index.js";
 import Navbar from "./components/Navbar.vue";
 import Sidebar from "./components/Sidebar.vue";
 import Loading from "vue-loading-overlay";
