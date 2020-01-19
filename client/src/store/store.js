@@ -3,7 +3,8 @@ import Vuex from 'vuex'
 import peaks from "peaks.js";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import Dexie from "dexie";
+
+import connectNodes from '@/lib/connectNodes';
 
 Vue.use(Vuex)
 export default new Vuex.Store({
@@ -164,41 +165,6 @@ export default new Vuex.Store({
             var mergerNode = audioContext.createChannelMerger(2);
             var stereoPannerNode = audioContext.createStereoPanner();
 
-            var NUM_BANDS = 10;
-            var peakings = new Array(NUM_BANDS);
-            // Center frequency
-            var frequency = 31.25;
-            for (var i = 0; i < NUM_BANDS; i++) {
-                // Create the instance of BiquadFilterNode
-                var peaking = audioContext.createBiquadFilter();
-                // Calculate center frequency
-                if (i !== 0) {
-                    frequency *= 2;
-                }
-                // Set parameters
-                peaking.type = (typeof peaking.type === 'string') ? 'peaking' : 5;
-                peaking.frequency.value = frequency;
-                peaking.Q.value = 2;
-                peaking.gain.value = 0;  // The default value
-                peakings[i] = peaking;
-            }
-
-            source.connect(gainNode);
-            gainNode.connect(peakings[0]);
-            peakings.forEach(function (peaking, index) {
-                if (index < (NUM_BANDS - 1)) {
-                    peaking.connect(peakings[index + 1]);
-                } else {
-                    peaking.connect(splitterNode);
-                }
-            });
-            splitterNode.connect(leftGainNode, 0);
-            splitterNode.connect(rightGainNode, 1);
-            leftGainNode.connect(mergerNode, 0, 0);
-            rightGainNode.connect(mergerNode, 0, 1);
-            mergerNode.connect(stereoPannerNode);
-            stereoPannerNode.connect(audioContext.destination);
-
             commit("setSourceNode", source);
             commit("setGainNode", { gainNode: gainNode, type: 'center' });
             commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
@@ -206,7 +172,9 @@ export default new Vuex.Store({
             commit("setSplitterNode", splitterNode);
             commit("setMergerNode", mergerNode);
             commit("setStereoPannerNode", stereoPannerNode);
-            commit("setPeakings", peakings);
+            commit("setPeakings", new Array(10));
+
+            connectNodes(state);
         },
         playLoop({ state, commit }, loop) {
             const p = state.p;
