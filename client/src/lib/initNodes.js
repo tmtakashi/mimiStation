@@ -1,4 +1,4 @@
-export default function connectNodes(state) {
+export function connectNodes(state) {
     const NUM_BANDS = state.peakings.length;
     // Center frequency
     var frequency = 31.25;
@@ -31,4 +31,25 @@ export default function connectNodes(state) {
     state.rightGainNode.connect(state.mergerNode, 0, 1);
     state.mergerNode.connect(state.stereoPannerNode);
     state.stereoPannerNode.connect(state.audioContext.destination);
+}
+
+export function createNodes(state, commit) {
+    var p = state.p;
+    var audioContext = state.audioContext;
+    var source = audioContext.createMediaElementSource(p.player._mediaElement)
+    var gainNode = audioContext.createGain();
+    var leftGainNode = audioContext.createGain();
+    var rightGainNode = audioContext.createGain();
+    var splitterNode = audioContext.createChannelSplitter(2);
+    var mergerNode = audioContext.createChannelMerger(2);
+    var stereoPannerNode = audioContext.createStereoPanner();
+
+    commit("setSourceNode", source);
+    commit("setGainNode", { gainNode: gainNode, type: 'center' });
+    commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
+    commit("setGainNode", { gainNode: rightGainNode, type: 'right' });
+    commit("setSplitterNode", splitterNode);
+    commit("setMergerNode", mergerNode);
+    commit("setStereoPannerNode", stereoPannerNode);
+    commit("setPeakings", new Array(10))
 }

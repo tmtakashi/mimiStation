@@ -4,7 +4,7 @@ import peaks from "peaks.js";
 import firebase from "firebase/app";
 import "firebase/firestore";
 
-import connectNodes from '@/lib/connectNodes';
+import { connectNodes, createNodes } from '@/lib/initNodes';
 
 Vue.use(Vuex)
 export default new Vuex.Store({
@@ -155,25 +155,7 @@ export default new Vuex.Store({
     actions: {
         initializeP({ state, commit }, options) {
             commit("setP", peaks.init(options));
-            var p = state.p;
-            var audioContext = state.audioContext;
-            var source = audioContext.createMediaElementSource(p.player._mediaElement)
-            var gainNode = audioContext.createGain();
-            var leftGainNode = audioContext.createGain();
-            var rightGainNode = audioContext.createGain();
-            var splitterNode = audioContext.createChannelSplitter(2);
-            var mergerNode = audioContext.createChannelMerger(2);
-            var stereoPannerNode = audioContext.createStereoPanner();
-
-            commit("setSourceNode", source);
-            commit("setGainNode", { gainNode: gainNode, type: 'center' });
-            commit("setGainNode", { gainNode: leftGainNode, type: 'left' });
-            commit("setGainNode", { gainNode: rightGainNode, type: 'right' });
-            commit("setSplitterNode", splitterNode);
-            commit("setMergerNode", mergerNode);
-            commit("setStereoPannerNode", stereoPannerNode);
-            commit("setPeakings", new Array(10));
-
+            createNodes(state, commit);
             connectNodes(state);
         },
         playLoop({ state, commit }, loop) {
