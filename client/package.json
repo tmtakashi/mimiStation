@@ -14,7 +14,7 @@
     "firebase": "^7.1.0",
     "mathjs": "^6.2.3",
     "peaks.js": "^0.13.0",
-    "underscore": "^1.9.1",
+    "underscore": "^1.12.1",
     "vee-validate": "^3.0.9",
     "vue": "^2.6.10",
     "vue-global-events": "^1.1.2",
