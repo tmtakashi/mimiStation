@@ -12,7 +12,7 @@
     "core-js": "^2.6.5",
     "dexie": "^2.0.4",
     "firebase": "^7.1.0",
-    "mathjs": "^6.2.3",
+    "mathjs": "^7.5.1",
     "peaks.js": "^0.13.0",
     "underscore": "^1.9.1",
     "vee-validate": "^3.0.9",
