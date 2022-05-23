@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "core-js": "^2.6.5",
-    "dexie": "^2.0.4",
+    "dexie": "^3.2.2",
     "firebase": "^7.1.0",
     "mathjs": "^6.2.3",
     "peaks.js": "^0.13.0",
